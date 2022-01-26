@@ -1,0 +1,39 @@
+# Libraries
+
+```{r}
+# Packages
+library(tidyverse)
+library(reticulate)
+```
+
+## Data
+
+```{r}
+# Load data
+df <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-01-18/chocolate.csv")
+print(df)
+```
+
+### R & Python
+```{r}
+# Store value for Python
+df_pypy <- df %>% select(company_location, review_date)
+```
+
+```{python}
+import pandas as pd
+
+# Validate reticulate from Python
+print(r.df_pypy)
+
+# Store value for R
+df_RR = r.df_pypy
+df_RR = df_RR.filter(["company_location"]).value_counts()
+```
+
+```{r}
+# Validate reticulate from R
+print(py$df_RR)
+
+py$df_RR %>% as_tibble()
+```

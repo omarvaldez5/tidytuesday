@@ -10,7 +10,7 @@ library(treemapify)
 library(ggsci)
 
 # ============================================================================ #
-# # Read data
+# Read data
 # ============================================================================ #
 
 tt_data <- tidytuesdayR::tt_load(2022, week = 3)
@@ -21,7 +21,6 @@ rm(tt_data)
 ### Python EDA
 ```{python Py-EDA, include=FALSE}
 import pandas as pd
-import sweetviz as sv
 import os
 
 # Working directory
@@ -31,18 +30,12 @@ os.getcwd()
 # Read from R
 chocolate = r.df
 
-# ============================================================================ #
-# # Info
-# ============================================================================ #
+# --- Info ---
 
 chocolate.columns
 chocolate.shape
 chocolate.info()
 chocolate.isnull().sum()
-
-# Sweetviz
-data_report = sv.analyze(chocolate)
-data_report.show_html("chocolate_EDA.html")
 
 # Files from folder
 all_files = os.listdir()
@@ -53,7 +46,7 @@ for f in all_files:
 ### Data Wrangling
 ```{r cleansing}
 # ============================================================================ #
-# # Top 10 country of bean origin ratings
+# Top 10 country of bean origin ratings
 # ============================================================================ #
 
 dta_pct <- df %>%

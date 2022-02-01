@@ -1,0 +1,143 @@
+# Chocolate Ratings
+
+### Load data and packages
+```{r R-Packages}
+library(tidyverse)
+library(reticulate)
+library(janitor)
+library(showtext)
+library(treemapify)
+library(ggsci)
+
+# ============================================================================ #
+# # Read data
+# ============================================================================ #
+
+tt_data <- tidytuesdayR::tt_load(2022, week = 3)
+df <- tt_data$chocolate %>% janitor::clean_names()
+rm(tt_data)
+```
+
+### Python EDA
+```{python Py-EDA, include=FALSE}
+import pandas as pd
+import sweetviz as sv
+import os
+
+# Working directory
+os.chdir("2022/W3_Chocolate")
+os.getcwd()
+
+# Read from R
+chocolate = r.df
+
+# ============================================================================ #
+# # Info
+# ============================================================================ #
+
+chocolate.columns
+chocolate.shape
+chocolate.info()
+chocolate.isnull().sum()
+
+# Sweetviz
+data_report = sv.analyze(chocolate)
+data_report.show_html("chocolate_EDA.html")
+
+# Files from folder
+all_files = os.listdir()
+for f in all_files:
+    print(f)
+```
+
+### Data Wrangling
+```{r cleansing}
+# ============================================================================ #
+# # Top 10 country of bean origin ratings
+# ============================================================================ #
+
+dta_pct <- df %>%
+    mutate(cocoa_percent = str_remove(cocoa_percent, "%")) %>%
+    mutate(cocoa_percent = as.numeric(cocoa_percent)) %>%
+    group_by(country_of_bean_origin) %>%
+    summarise(
+        n_count = n(),
+        avg_pct = mean(cocoa_percent)
+    ) %>%
+    ungroup() %>%
+    arrange(desc(n_count))
+```
+### Plot
+```{r ggplot}
+# Get font
+font_add_google("Montserrat")
+showtext_auto()
+
+# ============================================================================ #
+# PLOT
+# ============================================================================ #
+
+# Tottaly inspiration: https://github.com/nrennie/tidytuesday
+
+dta_pct %>%
+    ggplot(aes(
+        area = n_count,
+        fill = avg_pct,
+        label = country_of_bean_origin
+    )) +
+    geom_treemap(colour = "#452d28") +
+    geom_treemap_text(
+        fontface = "italic",
+        family = "Montserrat",
+        colour = "#452d28",
+        place = "centre",
+        grow = TRUE,
+        padding.x = grid::unit(4, "mm"),
+        padding.y = grid::unit(4, "mm")
+    ) +
+    scale_fill_material(
+        palette = "brown", name = "",
+        limits = c(70, 73),
+        breaks = c(70, 73),
+        labels = c("<--\nLower %", "-->\nHigher %"),
+        guide = guide_colourbar(title.position = "top")
+    ) +
+    labs(
+        title = "Where do cacao beans come?",
+        subtitle = "My first #TidyTuesday, totally inspired by @nrennie35\n"
+    ) +
+    theme_void() +
+    theme(
+        plot.background = element_rect(
+            fill = "#452d28",
+            colour = "#452d28"
+        ),
+        panel.background = element_rect(
+            fill = "#452d28",
+            colour = "#452d28"
+        ),
+        legend.position = "bottom",
+        plot.title = element_text(
+            colour = "#b29e97", family = "Montserrat", face = "bold",
+            size = 22
+        ),
+        plot.subtitle = element_text(
+            colour = "#b29e97", family = "Montserrat", size = 11
+        ),
+        legend.text = element_text(
+            colour = "#b29e97", family = "Montserrat", size = 12
+        ),
+        legend.title = element_text(
+            colour = "#b29e97", family = "Montserrat", size = 12
+        ),
+        plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm")
+    )
+
+# --- ggsave ---
+ggsave("W3_ChocolateRatings.svg",
+    width = 15,
+    height = 20,
+    units = "cm",
+    dpi = 320
+)
+```

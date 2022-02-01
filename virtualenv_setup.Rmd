@@ -4,25 +4,31 @@
 ```{r}
 # This is for VSCODE, personal use
 renv::init()
+renv::use_python(name = ".venv_tidy")
+
 renv::install("languageserver")
 renv::install("rmarkdown")
 renv::install("httpgd")
 renv::install("reticulate")
 renv::install("knitr")
-renv::use_python(name = ".venv_tidy")
 ```
 
 ## Packages
 ```{r}
-# Useful libraries
+# R
 renv::install("tidyverse")
 renv::install("tidytuesdayR")
+renv::install("janitor")
+renv::install("showtext")
+renv::install("ggtext")
+renv::install("treemapify")
+renv::install("ggsci")
+renv::install("svglite")
 
+# Python
 reticulate::py_install(packages = "pandas",
   envname = "/home/soso/Documents/02_TT/tidytuesday/.venv_tidy")
-```
 
-## Other libraries
-```{r}
-renv::install("janitor")
+reticulate::py_install(packages = "sweetviz",
+  envname = "/home/soso/Documents/02_TT/tidytuesday/.venv_tidy")
 ```

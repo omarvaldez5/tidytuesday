@@ -1,0 +1,117 @@
+# Week 5: Dog Breeds
+
+### Load data and packages
+```{r R-packages}
+library(tidytuesdayR)
+library(tidyverse)
+library(janitor)
+library(showtext)
+library(gt)
+library(gtExtras)
+
+# ============================================================================ #
+# Read Data
+# ============================================================================ #
+
+# For some reason, tidytuesdayR::tt_load() not working
+
+breed_rank_all <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-02-01/breed_rank.csv") %>%
+    janitor::clean_names() %>%
+    mutate(breed = str_squish(breed))
+
+breed_traits <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-02-01/breed_traits.csv') %>%
+    janitor::clean_names() %>%
+    mutate(breed = str_squish(breed))
+```
+
+### Data Wrangling
+```{r dataCleansing}
+# --- Ranking ---
+breed_rank <- breed_rank_all %>%
+    pivot_longer(x2013_rank:x2020_rank,
+        names_to = "year",
+        values_to = "rank"
+    ) %>%
+    mutate(year = parse_number(year)) %>%
+    # groupby and summarise
+    group_by(breed) %>%
+    summarise(median_rank = median(rank)) %>%
+    mutate(rank = dense_rank(median_rank)) %>%
+    ungroup() %>%
+    # arrange and slice
+    arrange(median_rank) %>%
+    slice(1:10) %>%
+    select(-median_rank) %>%
+    # Joining to get image column
+    left_join(breed_rank_all %>% select(breed, image), by = "breed")
+
+# --- Join breed_rank with traits ---
+df <- breed_rank %>%
+    left_join(breed_traits %>%
+        select(
+            breed,
+            affectionate_with_family,
+            good_with_young_children,
+            barking_level,
+            shedding_level,
+            trainability_level
+        ), by = "breed") %>%
+    relocate(image, everything())
+```
+
+### Table
+```{r gtImage}
+tbl <- df %>%
+    gt() %>%
+    gt_theme_nytimes() %>%
+    gt_img_rows(image) %>%
+    cols_label(
+        breed = "Breed",
+        rank = "Rank",
+        affectionate_with_family = "Family",
+        good_with_young_children = "Children",
+        barking_level = "Barking",
+        shedding_level = "Shedding",
+        trainability_level = "Trainability"
+    ) %>%
+    # Add colors
+    cols_label(
+        breed = html("<span style = 'color:#323E40;'>breed</span>"),
+        rank = html("<span style = 'color:#F2A922;'>rank</span>")
+    ) %>%
+    # Title
+    tab_header(
+        title = "Which Dog Should I Adopt?",
+        subtitle = md(
+            "Rank from 2013 to 2020. _Scale 1 to 5 (Except Rank Column),
+            the higher the better_")
+    ) %>%
+    tab_options(
+        heading.title.font.size = "30px",
+        heading.padding = "10px",
+        footnotes.padding = "10px",
+        source_notes.font.size = "10px",
+        column_labels.font.weight = "bold",
+        source_notes.padding = "10px"
+    ) %>%
+    # Footer
+    tab_source_note(
+        source_note =
+            gt::html("#TidyTuesday // Week 5 // @valdezdata //
+            Source: https://github.com/kkakey/dog_traits_AKC")
+    ) %>%
+    tab_footnote("Used 'median' instead of 'average' due to robustness
+      to outliers",
+        locations = cells_column_labels(columns = rank)
+    )
+```
+
+### Save Table
+```{r savingTable}
+tbl %>%
+    gtsave("DogBreed.png",
+        path = paste0(here::here(), "/2022/W5_DogBreeds")
+    )
+```
+
+

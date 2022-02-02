@@ -24,6 +24,10 @@ renv::install("ggtext")
 renv::install("treemapify")
 renv::install("ggsci")
 renv::install("svglite")
+renv::install("gt")
+renv::install("remotes")
+remotes::install_github("jthomasmock/gtExtras")
+renv::install("here")
 
 # Python
 reticulate::py_install(packages = "pandas",

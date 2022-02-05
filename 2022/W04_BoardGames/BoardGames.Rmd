@@ -14,7 +14,6 @@ library(tidyverse)
 library(janitor)
 library(showtext)
 library(reticulate)
-library(ggtext)
 library(glue)
 library(patchwork)
 
@@ -244,7 +243,9 @@ df_worst %>%
     )
 
 # --- ggsave ---
-ggsave("2022/W04_BoardGames/worst_boardgames_rating.png")
+ggsave("2022/W04_BoardGames/worst_boardgames_rating.png",
+    width = 7, height = 4.8
+)
 ```
 
 ### END

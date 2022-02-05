@@ -4,6 +4,7 @@ Inspired by
 https://github.com/jvieroe/TidyTuesday/blob/main/2022/week_04/code_boardgames.R
 
 And
+
 https://github.com/leeolney3/TidyTuesday/blob/main/2022/week_04/2022_04.R
 
 ### 1.0 Load packages and data
@@ -13,6 +14,10 @@ library(tidyverse)
 library(janitor)
 library(showtext)
 library(reticulate)
+library(ggtext)
+library(glue)
+library(patchwork)
+
 
 # ============================================================================ #
 # Read Data
@@ -41,7 +46,6 @@ df <- ratings %>%
 # What about bayes average?
 # https://en.wikipedia.org/wiki/Bayesian_average
 
-
 # Names data
 df_players <- df %>%
     select(
@@ -59,21 +63,27 @@ df_players <- df %>%
 ```
 
 ### 3.0 Using Python
-```{python}
+```{python iterator}
 # How to Create a column with repeating values pandas (mismatching indexes)
 # https://stackoverflow.com/questions/50804427/how-to-create-a-column-with-repeating-values-pandas-mismatching-indexes
 
 # Importing from R
 df = r.df_players
+all_data = r.df
 
 # Repeating section
 lista = ["Worst", "Best"]
 list_iterator = lista * int(len(df)/len(lista))
 df["best_worst"] = list_iterator
+
+all_data.users_rated.mean()
+all_data.users_rated.median()
+all_data.users_rated.max()
+all_data.users_rated.describe()
 ```
 
 ### 4.0 Back to R - Pivot longer
-```{r}
+```{r pivotLonger}
 # Adding data from Python
 df_players <- py$df %>%
     as_tibble()
@@ -90,58 +100,67 @@ df_players <- df_players  %>%
         names_to = "type",
         values_to = "value"
     )
+
+# Filter best and worst data frames
+df_best <- df_players %>%
+    filter(best_worst == "Best")
+
+df_worst <- df_players %>%
+    filter(best_worst == "Worst")
 ```
 
 
-### Bar Plot
-```{r}
+### Bar Plot for both data sets
+```{r barPlots}
 # ============================================================================ #
-# Plot geom_col with facet_wrap
+# Best Rated games
 
-# https://www.cedricscherer.com/2021/07/05/a-quick-how-to-on-labelling-bar-graphs-in-ggplot2/
-
-df_players %>%
+df_best %>%
+    rename(Rating = type)  %>%
     # ggplot
-    ggplot(aes(x = name, y = value, fill = type)) +
+    ggplot(aes(x = name, y = value, fill = Rating)) +
     # geoms
-    geom_col(position = position_dodge(0.7), width = 0.5) +
-    geom_label(
-        aes(
-            label = glue::glue("# users_rated:\n{users_rated}")
-        ),
-        nudge_y = -0.5,
-        fill = "white",
-        label.size = 0,
-        size = 3.5,
-        fontface = "bold"
-    ) +
+    geom_col(position = position_dodge(0.7), width = 0.3, alpha = 0.8) +
     facet_wrap(
         vars(
             name,
-            glue::glue("{best_worst} Game by Average Rating"),
-            glue::glue("# of players: {maxplayers}")
+            glue(
+                "# users_rated: {users_rated} | # max players: {maxplayers}")
         ),
-        nrow = 4,
-        scales = "free"
+        nrow = 2,
+        scales = "free_x"
     ) +
-    # labs
+    scale_fill_manual(values = c(
+        "#58ecf1",
+        "#12b16f"
+    )) +
+    scale_y_continuous(
+        limits = c(0, 10),
+        breaks = c(0, 4, 8)
+    ) +
+# labs
+# https://fulmicoton.com/posts/bayesian_rating/
     labs(
-        x = "",
-        y = "Rating",
-        title = "Careful with Average Ratings!",
-        subtitle = "Turns out if sample is low, do not trust in average",
-        caption = "@valdezdata"
+    x = "",
+    y = "Average Rating\n",
+    title = "Best Board Games by Rating\n",
+    caption = "@valdezdata | #TidyTuesday W04 | Kaggle Board Games Geek"
     ) +
-    # theme
+# theme
     theme(
         text = element_text(family = "Montserrat"),
-        rect = element_rect(fill = "antiquewhite"),
-        plot.background = element_rect(fill = "antiquewhite", color = NA),
-        panel.background = element_rect(fill = "antiquewhite", color = NA),
+        rect = element_rect(fill = "#cee9ff"),
+        plot.background = element_rect(fill = "#cee9ff", color = NA),
+        panel.background = element_rect(fill = "#cee9ff", color = NA),
         panel.border = element_blank(),
         legend.position = "bottom",
         plot.caption = element_text(size = 10),
-        plot.title = element_text(face = "bold", size = 24, hjust = 0.5),
+        plot.title = element_text(
+            face = "bold",
+            size = 20,
+            hjust = 0.5,
+            color = "#086460"
+            ),
         plot.subtitle = element_text(size = 12, hjust = 0.5),
         panel.grid.major.y = element_line(color = "grey75"),
         panel.grid.minor.y = element_blank(),
@@ -150,14 +169,82 @@ df_players %>%
         axis.text.y = element_text(face = "italic", size = 12),
         axis.text.x = element_blank(),
         axis.title.y = element_text(face = "bold", vjust = 1),
-        axis.title.x = element_text(face = "bold", vjust = -0.1)
+        axis.title.x = element_text(face = "bold", vjust = -0.1),
+        strip.background = element_rect(
+            fill = "#b8e3ff"
+        ),
+        strip.text.x = element_text(face = "bold", size = 10)
     )
+
+# --- ggsave ---
+ggsave("2022/W04_BoardGames/best_boardgames_rating.svg")
+
+# ============================================================================ #
+# Worst Rated games
+
+df_worst %>%
+    rename(Rating = type)  %>%
+    # ggplot
+    ggplot(aes(x = name, y = value, fill = Rating)) +
+    # geoms
+    geom_col(position = position_dodge(0.7), width = 0.3, alpha = 0.8) +
+    facet_wrap(
+        vars(
+            name,
+            glue(
+                "# users_rated: {users_rated} | # max players: {maxplayers}")
+        ),
+        nrow = 2,
+        scales = "free_x"
+    ) +
+    scale_fill_manual(values = c(
+        "#b96d16",
+        "#6e4225ab"
+    )) +
+    scale_y_continuous(
+        limits = c(0, 10),
+        breaks = c(0, 4, 8)
+    ) +
+# labs
+# https://fulmicoton.com/posts/bayesian_rating/
+    labs(
+    x = "",
+    y = "Average Rating\n",
+    title = "Worst Board Games by Rating\n",
+    caption = "@valdezdata | #TidyTuesday W04 | Kaggle Board Games Geek"
+    ) +
+# theme
+    theme(
+        text = element_text(family = "Montserrat"),
+        rect = element_rect(fill = "#ffd5ce"),
+        plot.background = element_rect(fill = "#ffd5ce", color = NA),
+        panel.background = element_rect(fill = "#ffd5ce", color = NA),
+        panel.border = element_blank(),
+        legend.position = "bottom",
+        plot.caption = element_text(size = 10),
+        plot.title = element_text(
+            face = "bold",
+            size = 20,
+            hjust = 0.5,
+            color = "#200446"
+            ),
+        plot.subtitle = element_text(size = 12, hjust = 0.5),
+        panel.grid.major.y = element_line(color = "grey75"),
+        panel.grid.minor.y = element_blank(),
+        panel.grid.major.x = element_line(color = "grey75"),
+        panel.grid.minor.x = element_blank(),
+        axis.text.y = element_text(face = "italic", size = 12),
+        axis.text.x = element_blank(),
+        axis.title.y = element_text(face = "bold", vjust = 1),
+        axis.title.x = element_text(face = "bold", vjust = -0.1),
+        strip.background = element_rect(
+            fill = "#ffc1b5"
+        ),
+        strip.text.x = element_text(face = "bold", size = 10)
+    )
+
+# --- ggsave ---
+ggsave("2022/W04_BoardGames/worst_boardgames_rating.svg")
 ```
 
-
-double y axis?
-facet wrap maxplayers
-users_rated maybe fill?
-name x axis
-
-add lable to the bars? users_RAted?
+### END

@@ -1,0 +1,163 @@
+# Week 04: BoardGames
+
+Inspired by
+https://github.com/jvieroe/TidyTuesday/blob/main/2022/week_04/code_boardgames.R
+
+And
+https://github.com/leeolney3/TidyTuesday/blob/main/2022/week_04/2022_04.R
+
+### 1.0 Load packages and data
+```{r R-packages}
+library(tidytuesdayR)
+library(tidyverse)
+library(janitor)
+library(showtext)
+library(reticulate)
+
+# ============================================================================ #
+# Read Data
+# ============================================================================ #
+
+# TidyTuesday Load
+df <- tidytuesdayR::tt_load(2022, week = 4)
+
+# data frame both tibbles
+ratings <- df$ratings %>%
+    janitor::clean_names()
+
+details <- df$details %>%
+    janitor::clean_names()
+
+# Join by id
+df <- ratings %>%
+    left_join(details, by = "id")
+```
+
+### 2.0 Data Wrangling
+```{r dataCleansing}
+# ============================================================================ #
+# Best High-Worse Rated board games from 1 to 4 players (Max)
+
+# What about bayes average?
+# https://en.wikipedia.org/wiki/Bayesian_average
+
+
+# Names data
+df_players <- df %>%
+    select(
+        name,
+        users_rated,
+        average,
+        bayes_average,
+        maxplayers
+    ) %>%
+    group_by(maxplayers) %>%
+    filter(average == min(average) | average == max(average)) %>%
+    filter(maxplayers <= 4 & maxplayers != 0) %>%
+    arrange(maxplayers, average) %>%
+    ungroup()
+```
+
+### 3.0 Using Python
+```{python}
+# How to Create a column with repeating values pandas (mismatching indexes)
+# https://stackoverflow.com/questions/50804427/how-to-create-a-column-with-repeating-values-pandas-mismatching-indexes
+
+# Importing from R
+df = r.df_players
+
+# Repeating section
+lista = ["Worst", "Best"]
+list_iterator = lista * int(len(df)/len(lista))
+df["best_worst"] = list_iterator
+```
+
+### 4.0 Back to R - Pivot longer
+```{r}
+# Adding data from Python
+df_players <- py$df %>%
+    as_tibble()
+
+# Format data
+df_players <- df_players  %>%
+    relocate(name, best_worst, maxplayers, everything()) %>%
+    mutate(
+        maxplayers = as_factor(maxplayers),
+        name = as_factor(name)
+    ) %>%
+    pivot_longer(
+        cols = average:bayes_average,
+        names_to = "type",
+        values_to = "value"
+    )
+```
+
+
+### Bar Plot
+```{r}
+# ============================================================================ #
+# Plot geom_col with facet_wrap
+
+# https://www.cedricscherer.com/2021/07/05/a-quick-how-to-on-labelling-bar-graphs-in-ggplot2/
+
+df_players %>%
+    # ggplot
+    ggplot(aes(x = name, y = value, fill = type)) +
+    # geoms
+    geom_col(position = position_dodge(0.7), width = 0.5) +
+    geom_label(
+        aes(
+            label = glue::glue("# users_rated:\n{users_rated}")
+        ),
+        nudge_y = -0.5,
+        fill = "white",
+        label.size = 0,
+        size = 3.5,
+        fontface = "bold"
+    ) +
+    facet_wrap(
+        vars(
+            name,
+            glue::glue("{best_worst} Game by Average Rating"),
+            glue::glue("# of players: {maxplayers}")
+        ),
+        nrow = 4,
+        scales = "free"
+    ) +
+    # labs
+    labs(
+        x = "",
+        y = "Rating",
+        title = "Careful with Average Ratings!",
+        subtitle = "Turns out if sample is low, do not trust in average",
+        caption = "@valdezdata"
+    ) +
+    # theme
+    theme(
+        text = element_text(family = "Montserrat"),
+        rect = element_rect(fill = "antiquewhite"),
+        plot.background = element_rect(fill = "antiquewhite", color = NA),
+        panel.background = element_rect(fill = "antiquewhite", color = NA),
+        panel.border = element_blank(),
+        legend.position = "bottom",
+        plot.caption = element_text(size = 10),
+        plot.title = element_text(face = "bold", size = 24, hjust = 0.5),
+        plot.subtitle = element_text(size = 12, hjust = 0.5),
+        panel.grid.major.y = element_line(color = "grey75"),
+        panel.grid.minor.y = element_blank(),
+        panel.grid.major.x = element_line(color = "grey75"),
+        panel.grid.minor.x = element_blank(),
+        axis.text.y = element_text(face = "italic", size = 12),
+        axis.text.x = element_blank(),
+        axis.title.y = element_text(face = "bold", vjust = 1),
+        axis.title.x = element_text(face = "bold", vjust = -0.1)
+    )
+```
+
+
+double y axis?
+facet wrap maxplayers
+users_rated maybe fill?
+name x axis
+
+add lable to the bars? users_RAted?

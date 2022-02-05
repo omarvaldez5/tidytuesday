@@ -26,8 +26,14 @@ renv::install("ggsci")
 renv::install("svglite")
 renv::install("gt")
 renv::install("remotes")
+renv::install("remotes")
+renv::install("devtools")
 remotes::install_github("jthomasmock/gtExtras")
+devtools::install_github("ricardo-bion/ggtech",
+                          dependencies = TRUE)
 renv::install("here")
+renv::install("wesanderson")
+renv::install("patchwork")
 
 # Python
 reticulate::py_install(packages = "pandas",

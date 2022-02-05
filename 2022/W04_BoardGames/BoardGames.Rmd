@@ -177,7 +177,7 @@ df_best %>%
     )
 
 # --- ggsave ---
-ggsave("2022/W04_BoardGames/best_boardgames_rating.svg")
+ggsave("2022/W04_BoardGames/best_boardgames_rating.png")
 
 # ============================================================================ #
 # Worst Rated games
@@ -244,7 +244,7 @@ df_worst %>%
     )
 
 # --- ggsave ---
-ggsave("2022/W04_BoardGames/worst_boardgames_rating.svg")
+ggsave("2022/W04_BoardGames/worst_boardgames_rating.png")
 ```
 
 ### END

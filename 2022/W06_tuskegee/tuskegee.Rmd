@@ -1,0 +1,112 @@
+# Week 06: Tuskegee Airmen
+
+Working with maps for the first time
+This graph is totally inspired by
+https://github.com/KittJonathan/tidytuesday/blob/master/R/2022_02_08_tuskegee.R
+
+
+## 1.0 Load packages and data
+```{r readData}
+library(tidytuesdayR)
+library(tidyverse)
+library(maps)
+
+# ============================================================================ #
+# Read Data
+# ============================================================================ #
+
+# TidyTuesday Load
+df <- tidytuesdayR::tt_load(2022, week = 6)
+
+# Error in tt_check_date.year(x, week) :
+# Only 5 TidyTuesday Weeks exist in 2022.
+# Please enter a value for week between 1 and 5
+
+
+
+print(Sys.Date())
+x  <- as.Date("2022-02-08")
+format(x, "%V") # Week "06"
+
+# Read data by date
+df <- tidytuesdayR::tt_load("2022-02-08")
+arimen <- df$airmen
+```
+
+## 2.0 Data Wrangling
+```{r dataCleansing}
+
+# US data raw
+us_states <- tibble(
+  state_name = state.name,
+  state_abb = state.abb,
+  centroid.x = state.center$x,
+  centroid.y = state.center$y)
+
+# Count states
+states_pilots <- airmen %>%
+    select(pilot_type, state) %>%
+    left_join(us_states, by = c("state" = "state_abb")) %>%
+    mutate(state_name = case_when(
+    state == "In" ~ "Indiana",
+    state == "DC" ~ "District Of Columbia",
+    state == "CN" ~ "Connecticut",
+    state == "KN" ~ "Kentucky",
+    TRUE ~ state_name)) %>%
+    filter(!is.na(state_name)) %>%
+    mutate(state_name = tolower(state_name)) %>%
+    count(state_name, sort = T)
+
+# Joining data with states pilots
+us_map <- map_data("state") %>%
+    left_join(states_pilots,
+        by = c("region" = "state_name")
+    )
+
+# Lower case
+us_states <- us_states %>%
+    mutate(state_name = tolower(state_name))
+
+# States
+states_count <- states_pilots %>%
+    left_join(us_states, by = c("state_name"))
+
+```
+
+## 3.0 Plot
+```{r mapPlot}
+ggplot() +
+    geom_polygon(
+        data = us_map,
+        mapping = (aes(x = long, y = lat, group = group, fill = n)),
+        colour = "#919191"
+    ) +
+    geom_text(
+        data = states_count,
+        mapping = aes(x = centroid.x, y = centroid.y, label = state_abb),
+        colour = "white"
+    ) +
+    theme_void() +
+    labs(
+        title = "Tuskegee Airmen - Pilot Types from U.S.",
+        subtitle =
+        "First time working with mapPlots - totally inspired by @KittJonathan",
+        caption = "#TidyTuesday | @valdezdata | #TuskegeeAirmenChallenge"
+    ) +
+    theme(
+        plot.title = element_text(
+            hjust = 0.5,
+            size = 20
+        ),
+        plot.subtitle = element_text(
+            hjust = 0.5,
+            size = 10
+        )
+    )
+```
+
+## 4.0 Save
+```{r savingPlot}
+ggsave("2022/W06_tuskegee/tuskegee.png")
+```
+

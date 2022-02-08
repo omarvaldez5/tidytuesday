@@ -34,6 +34,7 @@ devtools::install_github("ricardo-bion/ggtech",
 renv::install("here")
 renv::install("wesanderson")
 renv::install("patchwork")
+renv::install("maps")
 
 # Python
 reticulate::py_install(packages = "pandas",

@@ -1,0 +1,121 @@
+# Week 07: DuBois Challenge
+
+This time I was totally inspired by
+https://github.com/mitsuoxv/tidytuesday/blob/main/2022_02_15_dubois_ch3.Rmd
+
+Second time using map plots
+
+## 1.0 Read Data
+```{r readData}
+library(tidyverse)
+library(maps)
+library(showtext)
+
+us_map <- map_data("state")
+df <- read_csv("2022/W07_duBois/data.csv") %>% janitor::clean_names()
+```
+
+## 2.0 Data Wrangling
+```{r dataCleansing}
+main_map <- us_map %>%
+  ggplot(aes(long, lat, group = group)) +
+  geom_polygon(color = "white") +
+  coord_map("polyconic") +
+  theme_void()
+
+# ℹ The package `mapproj` is required for `coord_map()`
+# ✖ Would you like to install it?
+
+
+# Code from tuskegee.Rmd
+us_states <- tibble(
+  state_name = str_to_lower(state.name),
+  state_abb = state.abb,
+  centroid.x = state.center$x,
+  centroid.y = state.center$y)
+
+# Join data
+main_df <- df %>%
+    left_join(
+        us_states, by = c("state" = "state_abb")
+    ) %>%
+    rename(region = state_name) %>%
+    inner_join(
+        us_map, by = "region"
+    )
+```
+
+
+## 3.0 Plot
+```{r usMap}
+# Showtext
+font_add_google("Changa")
+showtext_opts(dpi = 300)
+showtext_auto(enable = TRUE)
+
+# ============================================================================ #
+# Plot
+
+main_df %>%
+    ggplot(
+        aes(
+            long, lat, group = group, fill = population
+        )
+    ) +
+    geom_polygon(color = "#7c7b7b") +
+    coord_map("polyconic") +
+    scale_fill_manual(
+        values = c(
+            "#d6c4b1", "#edb459", "#e5bfb3", "#ca0a30",
+            "#d6bca3", "#2c1f4b", "#74513a", "#ccbba9",
+            "#ae9c8e", "#201e1a"
+        )
+    ) +
+    guides(
+        fill = guide_legend(
+            title = NULL,
+            ncol = 2,
+            reverse = TRUE
+        )
+    ) +
+    labs(
+        title = "RELATIVE NEGRO POPULATION OF THE STATES OF THE\nUNITED STATES",
+        caption = "@valdezdata | #TidyTuesday W07 | #DuBoisChallenge"
+    ) +
+    theme_void() +
+    theme(
+        legend.position = "bottom",
+        plot.title = element_text(
+            hjust = 0.5,
+            vjust = -1.5,
+            family = "Changa",
+            margin = margin(b = 3, unit = "cm")
+        ),
+        plot.background = element_rect(
+            fill = "#E2D0BF",
+            color = NA
+        ),
+        legend.text = element_text(
+            margin = margin(
+                r = 1, unit = "cm"
+            )
+        ),
+        legend.key.size = unit(
+            0.8,
+            "cm"
+        )
+    )
+```
+
+## 4.0 Save
+```{r}
+ggsave("2022/W07_duBois/duBois.png",
+    units = "cm",
+    width = 12,
+    height = 16,
+    limitsize = F,
+    scale = 1.4
+)
+```
+
+Color fill is wrong, need to modify it.

@@ -7,7 +7,6 @@ https://github.com/KittJonathan/tidytuesday/blob/master/R/2022_02_08_tuskegee.R
 
 ## 1.0 Load packages and data
 ```{r readData}
-library(tidytuesdayR)
 library(tidyverse)
 library(maps)
 

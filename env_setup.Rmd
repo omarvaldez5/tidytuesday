@@ -32,6 +32,8 @@ devtools::install_github("ricardo-bion/ggtech",
                           dependencies = TRUE)
 renv::install("here")
 renv::install("maps")
+renv::install("skimr")
+renv::install("countrycode")
 
 # Python
 reticulate::py_install(packages = "pandas",

@@ -1,0 +1,123 @@
+# Week 08: Freedom in the World
+
+## 1.0 Read Data
+```{r readData}
+library(tidyverse)
+library(showtext)
+
+# Read
+df <- tidytuesdayR::tt_load(2022, week = 8)
+df <- df$freedom |>
+    janitor::clean_names()
+
+# EDA
+df |>
+    skimr::skim()
+```
+
+## 2.0 Data Wrangling
+```{r dataCleansing}
+df <- df |>
+    filter(year == 2020) |>
+    select(country, status, region_name) |>
+    mutate(status = case_when(
+        status == "F" ~ "Free",
+        status == "PF" ~ "Partially Free",
+        status == "NF" ~ "Not Free"
+    )) |>
+    mutate(country_code = countrycode::countrycode(
+        country,
+        origin = "country.name.en",
+        destination = "iso3c"
+    ))
+
+main_map <- map_data("world") |>
+    as_tibble() |>
+    mutate(country_code = countrycode::countrycode(
+        region,
+        origin = "country.name.en",
+        destination = "iso3c"
+    )) |>
+    filter(region != "Antarctica") |>
+    left_join(df, by = "country_code")
+```
+
+## 3.0 Plot
+```{r plotMap}
+# Font
+font_add_google("Alegreya")
+showtext_auto()
+
+ggplot() +
+    geom_polygon(
+        data = main_map,
+        mapping = aes(
+            x = long,
+            y = lat,
+            group = group,
+            fill = status
+        ),
+        colour = "#949494"
+    ) +
+    scale_fill_manual(
+        name = "Status",
+        values = c("#61bb18", "#ff7e5e", "#fffd6e"),
+        na.value = "#5a5a4a"
+    ) +
+    labs(
+        title = "Freedom in 2020",
+        caption = "@valdezdata | #TidyTuesday | Source: Freedom House"
+    ) +
+    guides(
+        size = guide_legend(title.position = "top", title.hjust = 0.5),
+        fill = guide_legend(title.position = "top", title.hjust = 0.5)
+    ) +
+    theme_void() +
+    theme(
+        legend.position = "bottom",
+        legend.text = element_text(
+            family = "Alegreya",
+            color = "#8d7d7d",
+            size = 30
+        ),
+        legend.title = element_text(
+            family = "Alegreya",
+            size = 35,
+            color = "#8d7d7d"
+        ),
+        axis.title = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.grid.major.y = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.background = element_rect(fill = "#fdf9f3", colour = NA),
+        plot.background = element_rect(fill = "#fdf9f3", colour = NA),
+        plot.title = element_text(
+            family = "Alegreya", hjust = 0.5,
+            colour = "#8d7d7d", size = 80,
+            margin = margin(10, 0, 0, 0)
+        ),
+        plot.subtitle = element_text(
+            family = "Alegreya", hjust = 0.5,
+            colour = "#8d7d7d", size = 50,
+            margin = margin(5, 0, 30, 0)
+        ),
+        plot.caption = element_text(
+            family = "Alegreya",
+            size = 16,
+            colour = "#8d7d7d",
+            vjust = 2.5
+        ),
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank()
+    )
+```
+
+## 4.0 Save
+```{r}
+ggsave("2022/W08_freedom/plot.png",
+    units = "cm",
+    width = 24,
+    height = 16,
+    scale = 0.8
+)
+```

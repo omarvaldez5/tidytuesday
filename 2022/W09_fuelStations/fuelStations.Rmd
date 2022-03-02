@@ -1,0 +1,188 @@
+# Week 09: Alternative Fuel Stations
+
+* fuel_type_code - The type of alternative fuel the station provides
+* State filter by united states (Country)
+* Status code search for planned and temporarily Unavailable
+* expected_date (For planned stations)
+* access_code Who is allowed to access??
+* owner_type_code organization that owns the fueling infrastructure
+* id - unique identifier for this specific station
+* facility_type - The type of facility at which the station is located
+
+
+## 1.0 Read Data
+```{r readData}
+library(tidyverse)
+
+df <- tidytuesdayR::tt_load(2022, week = 9)
+df <- df$stations |>
+    janitor::clean_names()
+
+df |> skimr::skim()
+```
+
+## 2.0 Data Wrangling
+```{r dataCleansing}
+facility_data <- df |>
+    filter(country == "US") |>
+    filter(access_code == "public") |>
+    select(
+        status_code,
+        facility_type
+    ) |>
+    mutate(
+        status_code = case_when(
+            status_code == "E" ~ "Available",
+            status_code == "P" ~ "Planned",
+            status_code == "T" ~ "Temporarily Unavailable"
+        )
+    ) |>
+    filter(status_code == "Temporarily Unavailable") |>
+    count(facility_type, status_code, sort = T) |>
+    slice_head(n = 15) |>
+    mutate(facility_type = str_to_lower(facility_type)) |>
+    mutate(facility_type = str_replace_all(facility_type, "_", " "))
+```
+
+## 3.0 Plot
+```{r}
+library(showtext)
+font_add_google("Special Elite", family = "special")
+showtext_auto()
+
+p1 <- facility_data |>
+    ggplot() +
+    # Make custom panel grid
+    geom_hline(
+        aes(yintercept = y),
+        data.frame(y = c(0:3) * 10),
+        color = "lightgrey"
+    ) +
+    geom_point(
+        aes(
+            x = reorder(str_wrap(facility_type, 5), n),
+            y = n
+        ),
+        size = 3,
+        color = "gray12"
+    ) +
+    geom_col(
+        aes(
+            x = reorder(str_wrap(facility_type, 5), n),
+            y = n,
+            fill = n
+        ),
+        position = "dodge2",
+        show.legend = TRUE,
+        alpha = 0.9
+    ) +
+    coord_polar() +
+    # Annotate custom scale inside plot
+    annotate(
+        x = 16.7,
+        y = 6,
+        label = "5",
+        geom = "text",
+        color = "gray12",
+        family = "special"
+    ) +
+    annotate(
+        x = 16.7,
+        y = 11,
+        label = "10",
+        geom = "text",
+        color = "gray12",
+        family = "special"
+    ) +
+    annotate(
+        x = 16.7,
+        y = 16,
+        label = "15",
+        geom = "text",
+        color = "gray12",
+        family = "special"
+    ) +
+    annotate(
+        x = 16.7,
+        y = 21,
+        label = "20",
+        geom = "text",
+        color = "gray12",
+        family = "special"
+    ) +
+    annotate(
+        x = 16.7,
+        y = 26,
+        label = "25",
+        geom = "text",
+        color = "gray12",
+        family = "special"
+    ) +
+    scale_y_continuous(
+        limits = c(-10, 30),
+        expand = c(0, 0),
+        breaks = c(0, 10, 20, 30)
+    ) +
+    scale_x_discrete(
+        expand = c(0, 0)
+    ) +
+    # New fill and legend title for number of tracks per region
+    scale_fill_gradientn(
+        "Quantity (n)",
+        colours = c("#6C5B7B", "#C06C84", "#F67280", "#F8B195")
+    ) +
+    # Make the guide for the fill discrete
+    guides(
+        fill = guide_colorsteps(
+            barwidth = 15,
+            barheight = 1.5,
+            title.position = "top",
+            title.hjust = 0.5
+        )
+    ) +
+    theme(
+        # Remove axis ticks and text
+        axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text.y = element_blank(),
+        # Use gray text for the region names
+        axis.text.x = element_text(
+            color = "gray12",
+            size = 12,
+            family = "special"
+        ),
+        # Move the legend to the bottom
+        legend.position = "bottom",
+    )
+
+
+p1 +
+    labs(
+        title = paste(
+            "\nQuantity of Public Temporarily\n",
+            "Unavailable Facilities for Alternative\n",
+            "Fuel Stations in the United States"
+        ),
+        subtitle = paste(
+            "\nWhen choosing a public alternative fuel station,\n",
+            "do not consider a 'fuel reseller'."
+        ),
+        caption = "@valdezdata | #TidyTuesday | Source: US DOT"
+    ) +
+    theme(
+        text = element_text(
+            color = "gray12", family = "special"
+        ),
+        plot.title = element_text(face = "bold", size = 25, hjust = 0.05),
+        plot.subtitle = element_text(size = 14, hjust = 0.05),
+        plot.caption = element_text(size = 10, hjust = 0.5),
+        panel.background = element_rect(fill = "white", color = "white"),
+        panel.grid = element_blank(),
+        panel.grid.major.x = element_blank()
+    )
+```
+
+## 4.0 Save
+```{r}
+ggsave("2022/W09_fuelStations/plot.svg", width = 9, height = 12.6)
+```

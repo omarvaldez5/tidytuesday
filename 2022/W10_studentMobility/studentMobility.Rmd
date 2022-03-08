@@ -1,0 +1,298 @@
+# Week 10: EU Student Mobility
+
+Totally inspired by: https://twitter.com/BjnNowak/status/1501138757810114561/photo/1
+
+* participant_nationality - Code (DE, FR, BE, …..)
+* participant_gender - Male/Female/Undefined
+* participant_profile - Staff or learner
+* special_needs - Yes/no
+* fewer_opportunities - Yes/no
+* sending_country_code - Code (DE, FR, BE, …..)
+* sending_city - City of sending organisation
+* receiving_country_code - Code (DE, FR, BE, …..)
+* receiving_city - City of receiving organisationn
+* participants - Total number of participants
+
+## 1.0 Read Data
+```{r readData}
+library(tidyverse)
+
+df <- tidytuesdayR::tt_load(2022, week = 10)
+df <- df$erasmus |>
+    janitor::clean_names()
+
+# From https://github.com/BjnNowak/TidyTuesday/blob/main/SC_Erasmus.R
+iso <- read_delim(
+    "https://raw.githubusercontent.com/BjnNowak/TidyTuesday/main/data/iso.csv",
+    delim = ";")
+
+skimr::skim(df)
+```
+
+## 2.0 Data Wrangling
+```{r}
+# Send data
+sending_data <- df |>
+    mutate(sending_female = case_when(
+        participant_gender == "Female" ~ participants,
+        TRUE ~ 0
+    )) |>
+    mutate(sending_male = case_when(
+        participant_gender == "Male" ~ participants,
+        TRUE ~ 0
+    )) |>
+    group_by(sending_country_code) |>
+    summarise(
+        female_total = sum(na.omit(sending_female)),
+        male_total =  sum(na.omit(sending_male)),
+        sending = sum(na.omit(participants))
+    ) |>
+    ungroup() |>
+    left_join(
+        iso,
+        by = c("sending_country_code" = "code")
+    ) |>
+    arrange(-sending) |>
+    select(-sending_country_code) |>
+    relocate(country_name) |>
+    pivot_longer(
+        cols = 2:3,
+        names_to = "female_or_male",
+        values_to = "count_sending"
+    ) |>
+    slice_head(n = 30)
+
+# Receiving data
+receiving_data <- df |>
+    mutate(receiving_female = case_when(
+        participant_gender == "Female" ~ participants,
+        TRUE ~ 0
+    )) |>
+    mutate(receiving_male = case_when(
+        participant_gender == "Male" ~ participants,
+        TRUE ~ 0
+    )) |>
+    group_by(receiving_country_code) |>
+    summarise(
+        female_total = sum(na.omit(receiving_female)),
+        male_total =  sum(na.omit(receiving_male)),
+        receiving = sum(na.omit(participants))
+    ) |>
+    ungroup() |>
+    left_join(
+        iso,
+        by = c("receiving_country_code" = "code")
+    ) |>
+    arrange(-receiving) |>
+    select(-receiving_country_code) |>
+    relocate(country_name) |>
+    pivot_longer(
+        cols = 2:3,
+        names_to = "female_or_male",
+        values_to = "count_receiving"
+    ) |>
+    slice_head(n = 30)
+
+# Join data
+exchange_tbl <- sending_data |>
+    inner_join(receiving_data) |>
+    select(
+        country_name,
+        female_or_male,
+        everything()
+    )
+```
+
+## 3.0 Plot
+```{r}
+library(showtext)
+font_add_google("Hubballi")
+showtext_auto()
+
+exchange_tbl |>
+    ggplot(
+        aes(
+            y = fct_reorder(
+                country_name,
+                receiving
+            )
+        )
+    ) +
+    geom_segment(
+        aes(
+            y = fct_reorder(
+                country_name,
+                receiving
+            ),
+            yend = fct_reorder(
+                country_name,
+                receiving
+            ),
+            x = 0,
+            xend = receiving
+        ),
+        size = 9,
+        col = "#0eac00",
+        alpha = 0.15,
+        inherit.aes = FALSE
+    ) +
+    geom_segment(
+        aes(
+            y = fct_reorder(
+                country_name,
+                receiving
+            ),
+            yend = fct_reorder(
+                country_name,
+                receiving
+            ),
+            x = 0,
+            xend = -sending
+        ),
+        size = 9,
+        col = "#dbd800",
+        alpha = 0.15,
+        inherit.aes = FALSE
+    ) +
+    geom_point(
+        aes(
+            count_sending,
+            fct_reorder(country_name, count_sending),
+            color = female_or_male
+        ),
+        size = 3,
+        show.legend = FALSE,
+        alpha = 0.75
+    ) +
+    geom_point(
+        aes(
+            -count_receiving,
+            fct_reorder(country_name, -count_receiving),
+            color = female_or_male
+        ),
+        size = 3,
+        show.legend = TRUE,
+        alpha = 0.75
+    ) +
+    scale_color_manual("Gender", values = c("#d70dff", "#0c4bf7")) +
+    scale_x_continuous(
+        position = "top",
+        breaks = c(
+            -30000, -20000, -10000, 10000, 20000, 30000
+        ),
+        labels = c(
+            "30,000", "20,000", "10,000", "10,000", "20,000", "30,000"
+        )
+    ) +
+    guides(
+        size = guide_legend(
+            title.position = "top", title.hjust = 0.5
+        ),
+        fill = guide_legend(
+            title.position = "top", title.hjust = 0.5
+        )
+    ) +
+    geom_text(
+        aes(
+            y = fct_reorder(
+                country_name,
+                receiving
+            ),
+            label = country_name
+        ),
+        x = 0,
+        color = "#6e6e6e",
+        alpha = 0.5
+    ) +
+    geom_text(
+        tibble(
+            y = "Czechia",
+            x = -25000,
+            label = "Outgoing\nStudents"
+        ),
+        mapping = aes(
+            x = x,
+            label = label
+        ),
+        y = "Czechia",
+        inherit.aes = FALSE,
+        size = 5,
+        vjust = 0.5,
+        family = "Huballi"
+    ) +
+    geom_text(
+        tibble(
+            y = "Czechia",
+            x = 25000,
+            label = "Incoming\nStudents"
+        ),
+        mapping = aes(
+            x = x,
+            label = label
+        ),
+        y = "Czechia",
+        inherit.aes = FALSE,
+        size = 5,
+        vjust = 0.5,
+        family = "Huballi"
+    ) +
+    labs(
+        x = "Number of Students",
+        y = "",
+        title = "Student Exchanges in Europe from Erasmus Program",
+        subtitle = paste(
+            " Bars shows the total number of participants,",
+            "dots represents the quantity of departures by gender.\n",
+            "Totally inspired by @BjnNowak"
+        ),
+        caption = "@valdezdata | #TidyTuesday | Source: Data.Europa.eu"
+    ) +
+    theme_void() +
+    theme(
+        legend.position = "bottom",
+        legend.text = element_text(
+            size = 15
+        ),
+        legend.title = element_text(
+            size = 15
+        ),
+        text = element_text(
+            family = "Hubballi"
+        ),
+        plot.background = element_rect(fill = "#F5F5F5"),
+        axis.text.x = element_text(size = 9),
+        axis.title.x = element_text(
+            size = 12,
+            face = "bold",
+            margin = margin(0.2, 0.2, 0.2, 0.2, unit = "cm"),
+            hjust = 0.5
+        ),
+        axis.title = element_text(
+            hjust = 0,
+            size = 9,
+            color = "#2A1A13"
+        ),
+        plot.title = element_text(
+            size = 20,
+            face = "bold",
+            color = "#2A1A13",
+            hjust = 0.05
+        ),
+        plot.subtitle = element_text(
+            size = 15,
+            face = "italic",
+            color = "#2A1A13",
+            hjust = 0.05
+        ),
+        plot.caption = element_text(
+            element_text(
+                size = 7
+            )
+        )
+    )
+```
+
+## 4.0 Save
+```{r}
+ggsave("2022/W10_studentMobility/plot.svg", width = 9, height = 12.6)
+```

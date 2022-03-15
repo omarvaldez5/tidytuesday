@@ -1,19 +1,20 @@
 # Week 10: EU Student Mobility
 
-Totally inspired by: https://twitter.com/BjnNowak/status/1501138757810114561/photo/1
+Totally inspired by: <https://twitter.com/BjnNowak/status/1501138757810114561/photo/1>
 
-* participant_nationality - Code (DE, FR, BE, …..)
-* participant_gender - Male/Female/Undefined
-* participant_profile - Staff or learner
-* special_needs - Yes/no
-* fewer_opportunities - Yes/no
-* sending_country_code - Code (DE, FR, BE, …..)
-* sending_city - City of sending organisation
-* receiving_country_code - Code (DE, FR, BE, …..)
-* receiving_city - City of receiving organisationn
-* participants - Total number of participants
+-   participant_nationality - Code (DE, FR, BE, .....)
+-   participant_gender - Male/Female/Undefined
+-   participant_profile - Staff or learner
+-   special_needs - Yes/no
+-   fewer_opportunities - Yes/no
+-   sending_country_code - Code (DE, FR, BE, .....)
+-   sending_city - City of sending organisation
+-   receiving_country_code - Code (DE, FR, BE, .....)
+-   receiving_city - City of receiving organisationn
+-   participants - Total number of participants
 
 ## 1.0 Read Data
+
 ```{r readData}
 library(tidyverse)
 
@@ -30,6 +31,7 @@ skimr::skim(df)
 ```
 
 ## 2.0 Data Wrangling
+
 ```{r}
 # Send data
 sending_data <- df |>
@@ -104,6 +106,7 @@ exchange_tbl <- sending_data |>
 ```
 
 ## 3.0 Plot
+
 ```{r}
 library(showtext)
 font_add_google("Hubballi")
@@ -293,6 +296,7 @@ exchange_tbl |>
 ```
 
 ## 4.0 Save
+
 ```{r}
 ggsave("2022/W10_studentMobility/plot.svg", width = 9, height = 12.6)
 ```

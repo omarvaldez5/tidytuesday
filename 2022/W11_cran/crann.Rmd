@@ -1,0 +1,59 @@
+# Week 11: R vignettes
+
+## 1.0 Read Data
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+
+tt <- tidytuesdayR::tt_load(2022, week = 11)
+df <- tt[["cran"]] |> janitor::clean_names()
+
+skimr::skim(df)
+```
+
+```{python quick_EDA }
+main_dta = r.df
+main_dta.describe()
+main_dta.info()
+main_dta.isnull().sum()
+```
+
+## 2.0 Data Wrangling
+
+```{r}
+# Wrangling inspired by @issa_madjid
+gg_df <- df |>
+  filter(str_detect(package, "ggplot")) |>
+  mutate(datetime = readr::parse_datetime(date,
+                                          format = "%Y-%m-%d %H:%M:%S UTC")) |>
+  drop_na(datetime) |>
+  arrange(datetime) |>
+  mutate(date = lubridate::date(datetime),
+         year = lubridate::year(date)) |>
+  count(year)
+```
+
+## 3.0 Plot
+
+```{r}
+gg_df |>
+  ggplot() +
+  geom_point(aes(x = year, y = n)) +
+  geom_line(aes(x = year, y = n)) +
+  scale_x_continuous(breaks = scales::pretty_breaks()) +
+  scale_y_continuous(breaks = scales::pretty_breaks()) +
+  labs(
+    x = "",
+    y = "Quantity",
+    title = "Number of versions released by year - ggplot2",
+    caption = "@valdezdata | #TidyTuesday | Source: Robert Flight GitHub"
+  ) +
+  theme_minimal()
+  
+```
+
+## 4.0 Save
+```{r}
+ggsave("2022/W11_cran/plot.png")
+```
+

@@ -1,20 +1,14 @@
 # START
 
 ## Setup
-```{r}
-# This is for VSCODE, personal use
+```{r status}
 renv::init()
-renv::use_python(name = ".venv_tidy")
-
-renv::install("languageserver")
-renv::install("rmarkdown")
-renv::install("httpgd")
-renv::install("reticulate")
-renv::install("knitr")
+renv::status()
+renv::snapshot()
 ```
 
-## Packages
-```{r}
+## R Packages
+```{r packages-R}
 # R
 renv::install("tidyverse")
 renv::install("tidytuesdayR")
@@ -34,8 +28,13 @@ renv::install("here")
 renv::install("maps")
 renv::install("skimr")
 renv::install("countrycode")
+```
 
-# Python
-reticulate::py_install(packages = "pandas",
-  envname = "/home/soso/Documents/02_TT/tidytuesday/.venv_tidy")
+## Python Packages
+```{r packages-python}
+# Python setup
+renv::use_python()
+
+reticulate::py_config()
+reticulate::py_install("pandas")
 ```

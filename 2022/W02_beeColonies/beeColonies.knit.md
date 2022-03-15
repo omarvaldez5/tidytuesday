@@ -4,12 +4,56 @@ This files is for testing purposes
 
 ### 1.0 Load packages and data
 
-```{r readData}
-library(tidyverse)
 
+```r
+library(tidyverse)
+```
+
+```
+## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
+```
+
+```
+## ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
+## ✓ tibble  3.1.6     ✓ dplyr   1.0.8
+## ✓ tidyr   1.2.0     ✓ stringr 1.4.0
+## ✓ readr   2.1.2     ✓ forcats 0.5.1
+```
+
+```
+## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()
+```
+
+```r
 # Tidy Tuesday Load
 df <- tidytuesdayR::tt_load(2022, week = 2)
+```
 
+```
+## --- Compiling #TidyTuesday Information for 2022-01-11 ----
+```
+
+```
+## --- There are 2 files available ---
+```
+
+```
+## --- Starting Download ---
+```
+
+```
+## 
+## 	Downloading file 1 of 2: `colony.csv`
+## 	Downloading file 2 of 2: `stressor.csv`
+```
+
+```
+## --- Download complete ---
+```
+
+```r
 # Store data sets
 colony  <- df$colony
 stressor <- df$stressor
@@ -18,7 +62,8 @@ rm(df)
 
 ### 2.0 Data Wrangling
 
-```{r dataCleansing}
+
+```r
 state_tbl <- colony %>%
     select(
         state,
@@ -47,7 +92,8 @@ state_tbl <- colony %>%
 
 ### 3.0 Plot
 
-```{r labelPlot}
+
+```r
 state_tbl %>%
     ggplot(aes(x = bee_mean, y = state, fill = color)) +
     geom_col(
@@ -68,8 +114,8 @@ state_tbl %>%
     )
 ```
 
+<img src="beeColonies_files/figure-html/labelPlot-1.png" width="672" />
+
 ### Save
 
-```{r}
-ggsave("2022/W02_beeColonies/beeColonies.svg")
-```
+

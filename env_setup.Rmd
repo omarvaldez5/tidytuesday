@@ -28,6 +28,7 @@ renv::install("here")
 renv::install("maps")
 renv::install("skimr")
 renv::install("countrycode")
+renv::install("palmerpenguins")
 ```
 
 ## Python Packages

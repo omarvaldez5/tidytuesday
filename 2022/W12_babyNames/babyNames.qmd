@@ -1,0 +1,60 @@
+# Week 12: Baby Names
+
+## 1.0 Read Data
+
+```{r loadData}
+library(tidyverse)
+library(reticulate)
+library(tidylo)
+
+tt <- tidytuesdayR::tt_load(2022, week = 12)
+df <- tt[["babynames"]] |> janitor::clean_names()
+```
+
+```{python quickEDA}
+dta = r.df
+dta.describe()
+dta.info()
+```
+
+## 2.0 Data Wrangling
+
+```{r logOdds}
+df_log <- df |> 
+  mutate(decade = 10 * floor(year / 10),
+         decade = paste0(decade, "s")) |> 
+  group_by(decade) |> 
+  count(name, wt = n, sort = T) |> 
+  ungroup() |> 
+  bind_log_odds(decade, name, n) |>
+  group_by(decade) |> 
+  slice_max(log_odds_weighted, n = 10) |> 
+  ungroup() |> 
+  mutate(decade = as.factor(decade),
+         name = fct_reorder(name, log_odds_weighted))
+```
+
+## 3.0 Plot
+
+```{r facetWrap}
+df_log |>
+  ggplot(aes(name, log_odds_weighted, fill = decade)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ decade, scales = "free_y") +
+  coord_flip() +
+  scale_y_continuous(expand = c(0, 0)) +
+  labs(
+    y = "Weighted Log Odds Ratio",
+    x = NULL,
+    title = "Most specific baby names by decade",
+    subtitle = "Source: https://juliasilge.com/blog/introducing-tidylo/",
+    caption = "@valdezdata | #TidyTuesday | Source: US babynames package"
+  ) +
+  theme_bw()
+```
+
+## 4.0 Save
+
+```{r ggsave}
+ggsave("2022/W12_babyNames/plot.svg", width = 10, height = 11)
+```

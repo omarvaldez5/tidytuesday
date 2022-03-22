@@ -1,12 +1,5 @@
 # START
 
-## Setup
-```{r status}
-renv::init()
-renv::status()
-renv::snapshot()
-```
-
 ## R Packages
 ```{r packages-R}
 # R
@@ -28,6 +21,7 @@ renv::install("here")
 renv::install("maps")
 renv::install("skimr")
 renv::install("countrycode")
+renv::install("tidylo")
 ```
 
 ## Python Packages

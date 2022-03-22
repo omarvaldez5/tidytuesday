@@ -10,7 +10,7 @@ Totally inspired by: <https://twitter.com/BjnNowak/status/1501138757810114561/ph
 -   sending_country_code - Code (DE, FR, BE, .....)
 -   sending_city - City of sending organisation
 -   receiving_country_code - Code (DE, FR, BE, .....)
--   receiving_city - City of receiving organisationn
+-   receiving_city - City of receiving organisation
 -   participants - Total number of participants
 
 ## 1.0 Read Data

@@ -6,6 +6,7 @@
 library(tidyverse)
 library(reticulate)
 library(tidylo)
+library(tidytext)
 
 tt <- tidytuesdayR::tt_load(2022, week = 12)
 df <- tt[["babynames"]] |> janitor::clean_names()
@@ -31,7 +32,7 @@ df_log <- df |>
   slice_max(log_odds_weighted, n = 10) |> 
   ungroup() |> 
   mutate(decade = as.factor(decade),
-         name = fct_reorder(name, log_odds_weighted))
+         name = tidytext::reorder_within(name, log_odds_weighted, decade))
 ```
 
 ## 3.0 Plot
@@ -42,6 +43,7 @@ df_log |>
   geom_col(show.legend = FALSE) +
   facet_wrap(~ decade, scales = "free_y") +
   coord_flip() +
+  tidytext::scale_x_reordered() +
   scale_y_continuous(expand = c(0, 0)) +
   labs(
     y = "Weighted Log Odds Ratio",

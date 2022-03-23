@@ -963,6 +963,13 @@
       "Repository": "CRAN",
       "Hash": "8a8f02d1934dfd6431c671361510dd0b"
     },
+    "tidylo": {
+      "Package": "tidylo",
+      "Version": "0.2.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "0f3dbe4eff9c0d18085be70d638dfaef"
+    },
     "tidyr": {
       "Package": "tidyr",
       "Version": "1.2.0",

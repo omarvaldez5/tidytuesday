@@ -37,6 +37,11 @@ women <- df |>
 ```{r}
 # Men plot
 p1 <- men |> 
+  group_by(year) |> 
+    summarise(
+    `Revenue Men` = sum(`Revenue Men`),
+    `Expenditure Men` =  sum(`Expenditure Men`)
+  ) |> 
   pivot_longer(-year) |> 
   ggplot(aes(x = year, y = value, fill = name)) +
   geom_col(position = "dodge") +
@@ -52,6 +57,11 @@ p1 <- men |>
 
 # Women plot
 p2 <- women |> 
+  group_by(year) |> 
+    summarise(
+    `Revenue Women` = sum(`Revenue Women`),
+    `Expenditure Women` =  sum(`Expenditure Women`)
+  ) |> 
   pivot_longer(-year) |> 
   ggplot(aes(x = year, y = value, fill = name)) +
   geom_col(position = "dodge") +
@@ -77,4 +87,3 @@ p3 + labs(caption = "@valdezdata | #TidyTuesday | Source: Equity in Athletics")
 ```{r}
 ggsave("2022/W13_collegiateSports/plot.png")
 ```
-

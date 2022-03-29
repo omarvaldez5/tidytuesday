@@ -23,6 +23,7 @@ renv::install("skimr")
 renv::install("countrycode")
 renv::install("tidylo")
 renv::install("tidytext")
+renv::install("patchwork")
 ```
 
 ## Python Packages

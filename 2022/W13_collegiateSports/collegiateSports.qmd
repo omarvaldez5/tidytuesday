@@ -1,0 +1,80 @@
+# Week 13: Collegiate Sports
+
+## 1.0 Read Data
+
+```{r}
+library(tidyverse)
+
+tt <- tidytuesdayR::tt_load(2022, week = 13)
+df <- tt[["sports"]] |> janitor::clean_names()
+
+skimr::skim(df)
+```
+
+## 2.0 Data Wrangling
+
+```{r}
+# Filter men and women
+men <- df |> 
+  select(
+    year,
+    `Revenue Men` = rev_men,
+    `Expenditure Men` = exp_men
+  ) |> 
+  drop_na()
+  
+women <- df |> 
+  select(
+    year,
+    `Revenue Women` = rev_women,
+    `Expenditure Women` = exp_women
+  ) |> 
+  drop_na()
+```
+
+## 3.0 Plot
+
+```{r}
+# Men plot
+p1 <- men |> 
+  pivot_longer(-year) |> 
+  ggplot(aes(x = year, y = value, fill = name)) +
+  geom_col(position = "dodge") +
+  scale_y_continuous(labels = scales::comma) +
+  theme_minimal() +
+  labs(
+    x = "",
+    y = "",
+    fill = "",
+    title = "Revenue & Expenditure by Men in College Sports"
+  ) +
+  scale_fill_manual(values = c("red", "blue"))
+
+# Women plot
+p2 <- women |> 
+  pivot_longer(-year) |> 
+  ggplot(aes(x = year, y = value, fill = name)) +
+  geom_col(position = "dodge") +
+  scale_y_continuous(labels = scales::comma) +
+  theme_minimal() +
+  labs(
+    x = "",
+    y = "",
+    fill = "",
+    title = "Revenue & Expenditure by Women in College Sports"
+  ) +
+  scale_fill_manual(values = c("gray", "darkgreen"))
+
+# Using patchwork
+library(patchwork)
+p3 <- p1 / p2
+
+p3 + labs(caption = "@valdezdata | #TidyTuesday | Source: Equity in Athletics")
+
+```
+
+## 4.0 Save
+```{r}
+ggsave("2022/W13_collegiateSports/plot.png")
+```
+

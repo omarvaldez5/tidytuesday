@@ -1,0 +1,159 @@
+# Week 14: Publications List
+
+## 1.0 Read Data
+```{r}
+library(tidyverse)
+
+tt <- tidytuesdayR::tt_load(2022, week = 14)
+df <- tt[["news_orgs"]] |> janitor::clean_names()
+
+skimr::skim(df)
+```
+
+## 2.0 Data Wrangling
+```{python}
+import pandas as pd
+
+# From R
+dta = r.df
+
+# Reg Ex
+pat = "((https?):\/\/)?(\w+\.)*(?P<domain>\w+)\.(\w+)(\/.*)?"
+dta_v2 = dta.url.str.extract(pat, expand=True)
+
+# Concatenate
+dta_v3 = pd.concat([dta, dta_v2], axis = 1)
+```
+
+
+```{r}
+library(reticulate)
+
+df <- py$dta_v3 |>
+  as_tibble()
+
+df <- df |> 
+  select(url, "1", "2", domain, "4", "5") |> 
+  mutate(
+    across(
+      where(is.list),
+      function(x) unlist(x)
+    )
+  )
+
+# How many Hypertext Transfer Protocol Secure?
+protocol <- df |>
+  pivot_longer(-url) |>
+  filter(name == 1) |>
+  count(value, sort = T) |>
+  mutate(
+    color = case_when(
+      row_number() == 1 ~ "#228b22",
+      row_number() == 2 ~ "#daa520",
+      row_number() == 3 ~ "#ff0000",
+      ## all others should be gray
+      TRUE ~ "gray70"
+    )
+  )
+
+# How many different than .com?
+dotcom <- df |> 
+  pivot_longer(-url) |> 
+  filter(name == 4) |> 
+  count(value, sort = T) |> 
+  slice(1:5) |> 
+    mutate(
+    color = case_when(
+      row_number() == 1 ~ "#344952",
+      row_number() == 2 ~ "#47487a",
+      row_number() == 3 ~ "#8e2b40",
+      row_number() == 4 ~ "#f8dd6e",
+      ## all others should be gray
+      TRUE ~ "gray70"
+    )
+  )
+```
+
+## 3.0 Plot
+```{r}
+library(showtext)
+
+font_add_google(name = "Red Hat Display", family = "Red Hat Display")
+font_add_google(name = "Red Hat Text", family = "Red Hat Text")
+
+# Protocol Plot
+p1 <- protocol |> 
+  mutate(value = fct_reorder(value, n)) |> 
+  ggplot(aes(x = value, y = n, fill = color)) +
+  geom_col(
+    position = position_dodge(0.7),
+    alpha = 0.8
+  ) +
+  coord_flip() +
+  scale_fill_identity(guide = "none") +
+  theme_minimal() +
+  geom_label(
+    aes(
+      label = scales::comma(n)
+    ),
+    hjust = 1.1,
+    size = 4,
+    fontface = "bold",
+    fill = "white",
+    label.size = 0
+  ) +
+  labs(
+    x = "",
+    y = "",
+    title = "Digital Publications",
+    subtitle = "How many of them have Hypertext Transfer Protocol Secure?"
+  ) +
+  theme(
+    text = element_text(family = "Red Hat Text", color = "#000000"),
+    plot.title = 
+      element_text(family = "Red Hat Display", size = 18),
+    plot.background = element_rect(color = "#f2f2f2", fill = "#f2f2f2")
+  )
+
+# dotcom Plot
+p2 <- dotcom |> 
+  mutate(value = fct_reorder(value, n)) |> 
+  ggplot(aes(x = value, y = n, fill = color)) +
+  geom_col(
+    position = position_dodge(0.7),
+    alpha = 0.8
+  ) +
+  coord_flip() +
+  scale_fill_identity(guide = "none") +
+  theme_minimal() +
+  geom_label(
+    aes(
+      label = scales::comma(n)
+    ),
+    hjust = 1.1,
+    size = 4,
+    fontface = "bold",
+    fill = "white",
+    label.size = 0
+  ) +
+  labs(
+    x = "",
+    y = "",
+    title = "Digital Publications",
+    subtitle = "Top 5 Domain Extensions Used"
+  ) +
+  theme(
+    text = element_text(family = "Red Hat Text", color = "#000000"),
+    plot.title = 
+      element_text(family = "Red Hat Display", size = 18),
+    plot.background = element_rect(color = "#f2f2f2", fill = "#f2f2f2")
+  )
+
+# Patchwork
+library(patchwork)
+p3 <- p1 + p2
+
+p3 + labs(caption = "@valdezdata | #TidyTuesday | Source: Project Oasis")
+```
+
+# End

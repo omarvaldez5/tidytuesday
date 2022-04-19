@@ -57,6 +57,7 @@ state_tbl = (df.pipe(vds.select_by_number, 2, 5)
 )
 
 # Seems there's no captions or subtitles for plotnine
+# No easy way to separate by commas numeric values
 
 # ============================================================================ #
 # END

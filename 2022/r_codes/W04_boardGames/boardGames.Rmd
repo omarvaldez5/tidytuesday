@@ -21,14 +21,14 @@ library(glue)
 # Read Data
 # ============================================================================ #
 
-# TidyTuesday Load
+# Tidy Tuesday Load
 df <- tidytuesdayR::tt_load(2022, week = 4)
 
 # data frame both tibbles
-ratings <- df$ratings %>%
+ratings <- df$ratings |> 
     janitor::clean_names()
 
-details <- df$details %>%
+details <- df$details |> 
     janitor::clean_names()
 
 # Join by id

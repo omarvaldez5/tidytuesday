@@ -105,18 +105,19 @@ df_players["best_worst"] = list_iterator
 # 2.1.3 Pivot Longer -- Using pyjanitor package
 
 df_players = (df_players.remove_columns(column_names=["avg_min", "avg_max"])
-        .reorder_columns(["name", "best_worst", "maxplayers"])
-        .change_type(["maxplayers", "name"], dtype=object)
-        .pivot_longer(index = slice("name", "users_rated"),
-                  column_names = slice("average", "bayes_average"),
-                  names_to = "type",
-                  values_to = "value"
-                  )
-    )
+              .reorder_columns(["name", "best_worst", "maxplayers"])
+              .change_type(["maxplayers", "name"], dtype=object)
+              .pivot_longer(index=slice("name", "users_rated"),
+                            column_names=slice("average", "bayes_average"),
+                            names_to="type",
+                            values_to="value"
+                            )
+              )
 
 # Filter best and worst data frames
 df_best = (df_players.query("best_worst == 'Best'").sort_values("maxplayers"))
-df_worst = (df_players.query("best_worst == 'Worst'").sort_values("maxplayers"))
+df_worst = (df_players.query(
+    "best_worst == 'Worst'").sort_values("maxplayers"))
 
 
 # ============================================================================ #

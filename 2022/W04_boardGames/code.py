@@ -42,6 +42,7 @@ jr.shuffle(df, random_state=1).to_clipboard(index=False)
 
 # ============================================================================ #
 # 2.1 Python
+# ============================================================================ #
 
 # https://stackoverflow.com/questions/72134067/filtering-after-grouped-pandas-dataframe-by-two-or-more-conditions-in-python
 
@@ -100,9 +101,28 @@ list_iterator = lista * int(len(df_players)/len(lista))
 df_players["best_worst"] = list_iterator
 
 
+# ============================================================================ #
+# 2.1.3 Pivot Longer -- Using pyjanitor package
+
+df_players = (df_players.remove_columns(column_names=["avg_min", "avg_max"])
+        .reorder_columns(["name", "best_worst", "maxplayers"])
+        .change_type(["maxplayers", "name"], dtype=object)
+        .pivot_longer(index = slice("name", "users_rated"),
+                  column_names = slice("average", "bayes_average"),
+                  names_to = "type",
+                  values_to = "value"
+                  )
+    )
+
+# Filter best and worst data frames
+df_best = (df_players.query("best_worst == 'Best'").sort_values("maxplayers"))
+df_worst = (df_players.query("best_worst == 'Worst'").sort_values("maxplayers"))
+
 
 # ============================================================================ #
 # 2.2 SQL
+# ============================================================================ #
+
 
 # Package
 from pandasql import sqldf

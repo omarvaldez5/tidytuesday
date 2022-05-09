@@ -68,7 +68,7 @@ dta = (pd.merge(dta, avgs, on=["maxplayers", "average"])
        )
 
 
-# Second approach -- Using this one
+# Second approach -- USING THIS ONE
 df_players = (df.pipe(vds.select_by_number, 2, 7, 5, 6, 15)
                 .groupby("maxplayers")
                 .apply(lambda x: x.assign(avg_min=min(x["average"]), avg_max=max(x["average"])))
@@ -124,12 +124,14 @@ df_worst = (df_players.query(
 # 2.2 SQL
 # ============================================================================ #
 
-
 # Package
 from pandasql import sqldf
 pysqldf = lambda q: sqldf(q, globals()) # Quicker to write query
 
 q = """
+
+    /* Doing partition by for min and max averages */
+    
     WITH cte_data AS
     (
         SELECT
@@ -144,15 +146,62 @@ q = """
         FROM df
     )
     
-    SELECT
-        *
+    /* Filtering avg min and avg max */
     
-    FROM cte_data
-        WHERE 1=1
-            AND (average = avg_min OR average = avg_max)
-            AND (maxplayers <= 4 AND maxplayers != 0)
-        ORDER BY maxplayers, average
+    , cte_min_max AS
+    (
+        SELECT
+            *
+    
+        FROM cte_data
+            WHERE 1=1
+                AND (average = avg_min OR average = avg_max)
+                AND (maxplayers <= 4 AND maxplayers != 0)
+            ORDER BY maxplayers, average
+    )
+    
+    /* Create column with "repeating values" */
+    
+    , cte_bs AS
+    (
+        SELECT
+            *
+            , CASE
+                WHEN avg_min = average
+                THEN 'Worst'
+                ELSE 'Best'
+                END AS best_worst
+    
+        FROM cte_min_max
+    )
+    
+    /* Because in SQLite there's no Pivot|Unpivot function, use UNION ALL */
+    
+    SELECT
+        name
+        , best_worst
+        , maxplayers
+        , users_rated
+        , 'average' AS type
+        , average AS value
+    
+    FROM cte_bs
+    UNION ALL
+    
+    SELECT
+        name
+        , best_worst
+        , maxplayers
+        , users_rated
+        , 'bayes_average'
+        , bayes_average
+    
+    FROM cte_bs
     ;
+    
+    /* Final step is to filter by best and worst with WHERE clause */
+    /* No need to do it. Using python data frames instead */
+    
     """
 
 pysqldf(q)

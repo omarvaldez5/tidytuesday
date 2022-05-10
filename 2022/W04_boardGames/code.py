@@ -6,10 +6,12 @@
 # 1.0 Load
 
 # Import libraries
+from unicodedata import category
 import pandas as pd
 import numpy as np
 import janitor as jr
 import valdezds as vds
+import plydata.cat_tools as cat
 import plotnine as p9
 
 # Display set for terminal
@@ -117,17 +119,20 @@ df_players = (df_players.remove_columns(column_names=["avg_min", "avg_max"])
 # ============================================================================ #
 # 2.1.4 Filtering Best and Worst Data Frames
 
+# https://www.business-science.io/python/2021/06/22/plotnine-correlation-plot.html?mc_cid=54d1c6a0bd&mc_eid=f599f6e014
+
 # Best
 df_best = (df_players.query("best_worst == 'Best'")
            .sort_values("maxplayers")
+           .assign(name = lambda x: x["name"] + " | Max Players | " + x["maxplayers"].astype(str))
+           .assign(name = lambda x: cat.cat_inorder(x["name"]))
            )
-
-# Modyfing column for readability in Plotnine
-df_best["name"] = df_best["name"] + " | Max Players | " + df_best["maxplayers"].astype(str)
 
 # Worst
 df_worst = (df_players.query("best_worst == 'Worst'")
             .sort_values("maxplayers")
+            .assign(name = lambda x: x["name"] + " | Max Players | " + x["maxplayers"].astype(str))
+            .assign(name = lambda x: cat.cat_inorder(x["name"]))
             )
 
 
@@ -269,12 +274,60 @@ pysqldf(q)
         strip_text_x=p9.element_text(face="bold", size=10)) +
     
     # watermark
-    p9.watermark("./iconvaldezdata.png")
+    p9.watermark("./iconvaldezdata.png", xo=25)
 )
 
 # ============================================================================ #
 # 3.2 Worst Rated Games
 
+(p9.ggplot(
+    mapping=p9.aes(x="name", y="value", fill="type"),
+    data=df_worst) +
+
+    # geoms
+    p9.geom_col(position=p9.position_dodge(0.7),
+                width=0.3,
+                alpha=0.8) +
+    p9.facet_wrap("name", nrow=2, scales="free_x") +
+    p9.scale_fill_manual(["#b96d16", "#6e4225ab"]) +
+    p9.scale_y_continuous(limits=[0, 10], breaks=[0, 4, 8]) +
+    p9.guides(fill=p9.guide_legend(title="Rating\n")) +
+
+    # labs
+    p9.labs(x="",
+            y="Average Rating\n",
+            title="Worst Board Games By Rating") +
+
+    # theme
+    p9.theme(
+        subplots_adjust={'hspace': 0.25},
+        legend_position="bottom",
+        legend_title_align="center",
+        legend_title=p9.element_text(face="bold"),
+        legend_text=p9.element_text(face="italic"),
+        rect=p9.element_rect(fill="#ffd5ce"),
+        plot_title=p9.element_text(face="bold", size=15),
+        plot_background=p9.element_rect(fill="#ffd5ce", color=None),
+        panel_background=p9.element_rect(fill="#ffd5ce", color=None),
+        panel_border=p9.element_blank(),
+        panel_spacing=0.25,
+        panel_grid_major_y=p9.element_line(color="#bfbfbf"),
+        panel_grid_minor_y=p9.element_blank(),
+        panel_grid_major_x=p9.element_line(color="#bfbfbf"),
+        panel_grid_minor_x=p9.element_blank(),
+        axis_text_y=p9.element_text(face="italic", size=12),
+        axis_text_x=p9.element_blank(),
+        axis_title_y=p9.element_text(face="bold"),
+        axis_title_x=p9.element_text(face="bold"),
+        strip_background=p9.element_rect(fill="#ffc1b5"),
+        strip_text_x=p9.element_text(face="bold", size=10)) +
+    
+    # watermark
+    p9.watermark("./iconvaldezdata.png", xo=25)
+)
+
+# Tableau
+# Pending
 
 # ============================================================================ #
 # END

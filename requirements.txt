@@ -1,7 +1,9 @@
+autopep8==1.6.0
 commonmark==0.9.1
 cycler==0.11.0
 descartes==1.1.0
 fonttools==4.32.0
+greenlet==1.1.2
 kiwisolver==1.4.2
 lazy-loader==0.1rc2
 matplotlib==3.5.1
@@ -13,9 +15,12 @@ packaging==21.3
 palettable==3.3.0
 pandas==1.4.2
 pandas-flavor==0.3.0
+pandasql==0.7.3
 patsy==0.5.2
 Pillow==9.1.0
 plotnine==0.8.0
+plydata==0.4.3
+pycodestyle==2.8.0
 Pygments==2.11.2
 pyjanitor==0.22.0
 pyparsing==3.0.8
@@ -24,7 +29,9 @@ pytz==2022.1
 rich==12.2.0
 scipy==1.8.0
 six==1.16.0
+SQLAlchemy==1.4.36
 statsmodels==0.13.2
+toml==0.10.2
 typing-extensions==4.2.0
 valdezds==0.0.1
 xarray==2022.3.0

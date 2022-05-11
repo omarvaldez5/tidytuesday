@@ -6,7 +6,6 @@
 # 1.0 Load
 
 # Import libraries
-from unicodedata import category
 import pandas as pd
 import numpy as np
 import janitor as jr

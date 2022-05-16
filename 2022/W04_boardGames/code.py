@@ -127,12 +127,19 @@ df_best = (df_players.query("best_worst == 'Best'")
            .assign(name = lambda x: cat.cat_inorder(x["name"]))
            )
 
+# Save to csv (Tableau)
+df_best.to_csv("2022/W04_boardGames/data_bestBoardGames.csv", index=False)
+
+
 # Worst
 df_worst = (df_players.query("best_worst == 'Worst'")
             .sort_values("maxplayers")
             .assign(name = lambda x: x["name"] + " | Max Players | " + x["maxplayers"].astype(str))
             .assign(name = lambda x: cat.cat_inorder(x["name"]))
             )
+
+# Save to csv (Tableau)
+df_worst.to_csv("2022/W04_boardGames/data_worstBoardGames.csv", index=False)
 
 
 # ============================================================================ #
@@ -216,7 +223,7 @@ q = """
     
     /* Final step is to filter by best and worst with WHERE clause */
     /* No need to do it. Using python data frames instead */
-    /* In the end of the day, I'll be using pandas data frames for plots */
+    /* I'll be using pandas data frames for plots */
     
     """
 
@@ -326,7 +333,7 @@ pysqldf(q)
 )
 
 # Tableau
-# Pending
+# https://public.tableau.com/app/profile/omar.valdez/viz/TidyTuesdayW04_boardGames/BestBoardGamesByRating
 
 # ============================================================================ #
 # END

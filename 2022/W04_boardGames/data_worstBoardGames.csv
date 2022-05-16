@@ -1,0 +1,9 @@
+name,best_worst,maxplayers,users_rated,type,value
+Solitaire | Max Players | 1.0,Worst,1.0,1014,average,4.4
+Solitaire | Max Players | 1.0,Worst,1.0,1014,bayes_average,5.067
+W.W.B | Max Players | 2.0,Worst,2.0,40,average,1.44
+W.W.B | Max Players | 2.0,Worst,2.0,40,bayes_average,5.41
+Exploration: Warzone | Max Players | 3.0,Worst,3.0,47,average,3.55
+Exploration: Warzone | Max Players | 3.0,Worst,3.0,47,bayes_average,5.445
+Oneupmanship: Mine's Bigger | Max Players | 4.0,Worst,4.0,75,average,1.04
+Oneupmanship: Mine's Bigger | Max Players | 4.0,Worst,4.0,75,bayes_average,5.319

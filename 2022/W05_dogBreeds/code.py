@@ -48,10 +48,6 @@ breed_traits["breed"] = breed_traits["breed"].astype("str")
 breed_rank_all["breed"] = breed_rank_all["breed"].apply(lambda x: re.sub("\\s|’", "_", x))
 breed_traits["breed"] = breed_traits["breed"].apply(lambda x: re.sub("\\s|’", "_", x))
 
-# Confirm whitespaces
-breed_rank_all["breed"].str.len()
-breed_traits["breed"].str.len()
-
 # Ranking
 breed_rank = (breed_rank_all.pivot_longer(index=["breed", "links", "image"],
                                           column_names=slice(
@@ -79,6 +75,11 @@ df = (breed_rank.merge(breed_traits[["breed", "affectionate_with_family",
                        on="breed")
       .move(source="image", target="breed", position="before", axis=1)
       )
+
+
+# ============================================================================ #
+# 2.1.1 Save to CSV
+df.to_csv("2022/W05_dogBreeds/data_dogBreeds.csv", index=False)
 
 
 # ============================================================================ #
@@ -127,19 +128,28 @@ q = """
     )
     
     /* ************************************************** */
-    /* Pivot Longer */
-    /* In progress... */
+    /* NOTES: */
+    /* There's not pivot longer function and usually */
+    /* the best way to solve this issue is by doing */
+    /* UNION ALL. However, do I need to do that for all year */
+    /* ranks? Somehow that's tedious. */
+    /* Besides, I still can't figure out why I wasn't able to do a subquery */
+    /* when joining both datasets */
     /* ************************************************** */
-    
-    SELECT * FROM cte_total
     ;
     """
 
 pysqldf(q)
 
+
 # ============================================================================ #
 # 3.0 Plot
 # ============================================================================ #
+
+# There's no gt() package in python, moving into Tableau:
+# Link:
+# https://public.tableau.com/app/profile/omar.valdez/viz/TidyTuesdayW05_dogBreeds/Dashboard1
+
 
 
 # ============================================================================ #

@@ -147,7 +147,8 @@ pysqldf(q)
 # ============================================================================ #
 
 # There's no gt() package in python, moving into Tableau:
-# Link:
+
+# Tableau:
 # https://public.tableau.com/app/profile/omar.valdez/viz/TidyTuesdayW05_dogBreeds/Dashboard1
 
 

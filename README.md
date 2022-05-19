@@ -10,3 +10,5 @@ _UPDATE: Since April 18th, 2022, I'll be using Python, SQL & Tableau for TidyTue
 **You can find past R codes under 2022/r_codes**
 
 _Note: Some folders don't have image files but have tableau links at the bottom of each code script._
+
+_If you want to go to my Tableau plots directly, [click here](https://public.tableau.com/app/profile/omar.valdez)_

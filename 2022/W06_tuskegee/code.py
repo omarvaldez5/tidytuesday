@@ -25,9 +25,24 @@ df = pd.read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/
 df.to_clipboard(index=False)
 jr.shuffle(df, random_state=283).to_clipboard(index=False)
 
+# Quick EDA
+df.info()
+df.isnull().sum()
+df.shape
+vds.select_by_number(df, 3, 7, 5, 14).describe()
+
 # ============================================================================ #
 # 2.0 Data Wrangling
 # ============================================================================ #
+
+# Plotnine info map:
+# https://plotnine.readthedocs.io/en/stable/generated/plotnine.geoms.geom_map.html
+
+# Installation geopandas
+# https://geopandas.org/en/stable/getting_started/install.html
+
+# Intro
+# https://geopandas.org/en/stable/getting_started/introduction.html
 
 # ============================================================================ #
 # 2.1 Python

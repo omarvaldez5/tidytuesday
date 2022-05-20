@@ -9,6 +9,7 @@
 import pandas as pd
 import janitor as jr
 import valdezds as vds
+import geopandas as gp
 
 vds.getwd() # Confirm working directory
 
@@ -47,6 +48,25 @@ vds.select_by_number(df, 3, 7, 5, 14).describe()
 # ============================================================================ #
 # 2.1 Python
 # ============================================================================ #
+
+
+path_to_data = gp.datasets.get_path("nybb")
+gdf = gp.read_file(path_to_data)
+
+gdf = gdf.set_index("BoroName")
+gdf["area"] = gdf.area
+gdf["area"]
+
+
+gdf['boundary'] = gdf.boundary
+gdf['boundary']
+
+
+gdf['centroid'] = gdf.centroid
+gdf['centroid']
+
+
+gdf.plot("area", legend=True)
 
 
 # ============================================================================ #

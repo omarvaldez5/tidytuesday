@@ -144,14 +144,15 @@ pysqldf(q)
     ) +
     
     # watermark
-    p9.watermark("./iconvaldezdata.png")
+    p9.watermark("./iconvaldezdata.png", xo=25)
 )
 
 # ============================================================================ #
 # 3.2 Tableau
 # ============================================================================ #
 
-
+# Link:
+# https://public.tableau.com/app/profile/omar.valdez/viz/TidyTuesdayW06_tuskegee/TidyTuesdayW06_Tuskegee
 
 # ============================================================================ #
 # END

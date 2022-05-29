@@ -280,7 +280,7 @@ pysqldf(q)
         strip_text_x=p9.element_text(face="bold", size=10)) +
     
     # watermark
-    p9.watermark("./iconvaldezdata.png", xo=25)
+    p9.watermark("./vdicon.png", xo=25, yo=15)
 )
 
 # ============================================================================ #
@@ -329,7 +329,7 @@ pysqldf(q)
         strip_text_x=p9.element_text(face="bold", size=10)) +
     
     # watermark
-    p9.watermark("./iconvaldezdata.png", xo=25)
+    p9.watermark("./vdicon.png", xo=25, yo=15)
 )
 
 # Tableau

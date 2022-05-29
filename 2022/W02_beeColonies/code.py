@@ -98,7 +98,7 @@ pysqldf(q)
  + p9.coord_flip()
  + p9.scale_y_continuous(breaks = [25000,50000,75000,100000],
                       labels = ["25,000", "50,000", "75,000", "100,000"])
- + p9.watermark("./iconvaldezdata.png")
+ + p9.watermark("./vdicon.png", xo=25, yo=15)
  + p9.labs(
      x = "",
      y = "",

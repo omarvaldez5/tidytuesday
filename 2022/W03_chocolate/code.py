@@ -84,6 +84,7 @@ pysqldf(q)
 (p9.ggplot(dta_pct)
  + p9.aes(x = "n_count", y = "country_of_bean_origin", fill = "avg_pct")
  + p9.geom_tile(stat = "identity")
+ + p9.watermark("./vdicon.png", xo=25, yo=15)
 )
 
 # No geom_treemap available (Package treemapify in R)

@@ -9,6 +9,7 @@
 import pandas as pd
 import janitor as jr
 import valdezds as vds
+import geopandas as gp
 
 vds.getwd() # Confirm working directory
 
@@ -39,24 +40,27 @@ jr.get_dupes(df)
 # 2.1 Python
 # ============================================================================ #
 
-(
-    df.query("year == 2020")
-    .select_columns(["country", "status", "region_name"])
-    .case_when(
-        df.status == "F", "Free",
-        df.status == "PF", "Partially Free",
-        df.status == "NF", "Not Free",
-        "N/A",
-        column_name="status"
+# Get geometry
+world_filepath = gp.datasets.get_path("naturalearth_lowres")
+world = gp.read_file(world_filepath)
+
+# Dataset
+data_world = (df.query("year == 2020")
+              .select_columns(["country", "status", "region_name"])
+              .case_when(
+    df.status == "F", "Free",
+    df.status == "PF", "Partially Free",
+    df.status == "NF", "Not Free",
+    "N/A",
+    column_name="status"
     )
+    .query("region_name != 'Antarctica'")
+    .merge(world, left_on="country", right_on="name")
 )
-
-# https://geopandas.org/en/stable/docs/user_guide/mergingdata.html
-
-# Atribute Joins search link
 
 # ============================================================================ #
 # 2.1.1 Save to CSV
+data_world.to_csv("2022/W08_freedom/data_freedom.csv")
 
 
 # ============================================================================ #
@@ -68,11 +72,25 @@ from pandasql import sqldf
 pysqldf = lambda q: sqldf(q, globals()) # Quicker to write query
 
 q = """
+    SELECT
+        country
+        , CASE
+            WHEN status = 'F' THEN 'Free'
+            WHEN status = 'PF' THEN 'Partially Free'
+            WHEN status = 'NF' THEN 'Not Free'
+            ELSE NULL
+            END AS status
+        , region_name
+    
+    FROM df d
+    INNER JOIN world
+        ON d.country = w.name
     ;
     """
 
 pysqldf(q)
 
+# Error: https://docs.sqlalchemy.org/en/14/errors.html#error-rvf5
 
 # ============================================================================ #
 # 3.0 Plot

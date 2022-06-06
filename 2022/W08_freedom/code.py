@@ -6,10 +6,12 @@
 # 1.0 Load
 
 # Import libraries
+from matplotlib.pyplot import subplots_adjust
 import pandas as pd
 import janitor as jr
 import valdezds as vds
 import geopandas as gp
+import plotnine as p9
 
 vds.getwd() # Confirm working directory
 
@@ -100,11 +102,47 @@ pysqldf(q)
 # 3.1 Plotnine
 # ============================================================================ #
 
+(
+    p9.ggplot() +
+
+    # geoms
+    p9.geom_map(data=data_world,
+                mapping=p9.aes(fill="status")) +
+    p9.scale_fill_manual(values=["#61bb18", "#ff7e5e", "#fffd6e"]) +
+
+    # labs
+    p9.labs(x="", y="",
+            title="Freedom in 2020") +
+
+    # theme
+    p9.theme_void() +
+    p9.theme(
+        subplots_adjust={'hspace': 0.25},
+        figure_size=(10, 6),
+        legend_position="bottom",
+        legend_text=p9.element_text(face="bold", color="#8d7d7d"),
+        legend_title=p9.element_text(face="bold", color="#8d7d7d"),
+        axis_title=p9.element_blank(),
+        panel_grid_minor=p9.element_blank(),
+        panel_grid_major_y=p9.element_blank(),
+        panel_grid_major_x=p9.element_blank(),
+        panel_background=p9.element_rect(fill="#fdf9f3"),
+        plot_background=p9.element_rect(fill="#fdf9f3"),
+        plot_title=p9.element_text(color="#8d7d7d", face="bold", size=15),
+        axis_text_x=p9.element_blank(),
+        axis_text_y=p9.element_blank()
+    ) +
+    
+    # watermark
+    p9.watermark("./vdicon.png", xo=25, yo=15)
+)
+
 # ============================================================================ #
 # 3.2 Tableau
 # ============================================================================ #
 
-
+# Link:
+# 
 
 # ============================================================================ #
 # END

@@ -6,9 +6,11 @@
 # 1.0 Load
 
 # Import libraries
+from typing import Mapping
 import pandas as pd
 import janitor as jr
 import valdezds as vds
+import plotnine as p9
 
 vds.getwd() # Confirm working directory
 
@@ -131,6 +133,15 @@ pysqldf(q)
 # ============================================================================ #
 # 3.1 Plotnine
 # ============================================================================ #
+
+# Test
+(
+    p9.ggplot(data=fuel_data, mapping=p9.aes(x="facility_type", y="n_size")) +
+    p9.geom_col()
+)
+
+# UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+# <ggplot: (8727826409340)>
 
 # ============================================================================ #
 # 3.2 Tableau

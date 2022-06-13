@@ -6,7 +6,6 @@
 # 1.0 Load
 
 # Import libraries
-from typing import Mapping
 import pandas as pd
 import janitor as jr
 import valdezds as vds
@@ -134,18 +133,51 @@ pysqldf(q)
 # 3.1 Plotnine
 # ============================================================================ #
 
-# Test
-(
-    p9.ggplot(data=fuel_data, mapping=p9.aes(x="facility_type", y="n_size")) +
-    p9.geom_col()
-)
-
 # UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
 # <ggplot: (8727826409340)>
+
+# https://stackoverflow.com/questions/56656777/userwarning-matplotlib-is-currently-using-agg-which-is-a-non-gui-backend-so
+
+# Simple plot
+(
+    p9.ggplot(
+        data=fuel_data,
+        mapping=p9.aes(x="reorder(facility_type, n_size)", y="n_size")
+    ) +
+    
+    # geoms
+    p9.geom_col(position=p9.position_dodge(0.8),
+                width=0.8,
+                alpha=0.8) +
+    p9.coord_flip() +
+    p9.scale_y_continuous(breaks=[5,10,15,20,25,30]) +
+    
+    # labs
+    p9.labs(x="Facility type",
+            y="Quantity",
+            title="Unavailable Facilities for Alternative Fuel Stations in U.S.A") +
+    
+    # Theme
+    p9.theme(
+        subplots_adjust={'hspace': 0.25},
+        figure_size=(10,6),
+        panel_background=p9.element_rect(fill="snow"),
+        axis_title=p9.element_text(face="bold"),
+        axis_text=p9.element_text(face="italic"),
+        plot_title=p9.element_text(face="bold", size=15)
+    ) +
+    
+    # watermark
+    p9.watermark("./vdicon.png", xo=25, yo=15)
+)
+
 
 # ============================================================================ #
 # 3.2 Tableau
 # ============================================================================ #
+
+# Link:
+# https://public.tableau.com/app/profile/omar.valdez/viz/TidyTuesdayW09_fuelStations/Sheet1
 
 
 

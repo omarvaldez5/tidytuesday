@@ -1,0 +1,31 @@
+,country_name,sending,code_sending,female_or_male_sending,count_sending,receiving,code_receiving,female_or_male_receiving,count_receiving
+0,Germany,34394,DE,female_total,17138,34278,DE,female_total,17097
+1,Poland,30876,PL,female_total,18085,30439,PL,female_total,17789
+2,Great Britain,19725,UK,female_total,11566,19521,UK,female_total,11463
+3,Spain,17413,ES,female_total,9352,17887,ES,female_total,9642
+4,France,15942,FR,female_total,8759,17773,FR,female_total,9768
+5,Hungary,15692,HU,female_total,9018,15335,HU,female_total,8812
+6,Romania,13809,RO,female_total,7913,13487,RO,female_total,7723
+7,Czechia,13736,CZ,female_total,7392,13763,CZ,female_total,7409
+8,Turkey,12358,TR,female_total,6837,12249,TR,female_total,6777
+9,Italy,11586,IT,female_total,6158,11545,IT,female_total,6161
+10,Slovakia,11384,SK,female_total,6751,11084,SK,female_total,6563
+11,Latvia,9598,LV,female_total,6429,9383,LV,female_total,6283
+12,Lithuania,9060,LT,female_total,5668,9212,LT,female_total,5733
+13,Bulgaria,8297,BG,female_total,4760,7933,BG,female_total,4527
+14,Portugal,8047,PT,female_total,4294,7945,PT,female_total,4238
+15,Denmark,7639,DK,female_total,4322,7737,DK,female_total,4391
+16,Slovenia,6734,SI,female_total,3874,6844,SI,female_total,3930
+17,Croatia,6288,HR,female_total,3904,6367,HR,female_total,3902
+18,Estonia,6106,EE,female_total,3660,6369,EE,female_total,3777
+19,Belgium,5942,BE,female_total,3056,6816,BE,female_total,3582
+20,Austria,5431,AT,female_total,2856,5397,AT,female_total,2900
+21,Malta,4939,MT,female_total,2514,5044,MT,female_total,2587
+22,Ireland,4201,IE,female_total,2235,4172,IE,female_total,2244
+23,,4028,,female_total,2409,4006,,female_total,2399
+24,Netherlands,3959,NL,female_total,1928,4260,NL,female_total,2141
+25,Cyprus,3801,CY,female_total,2087,3897,CY,female_total,2143
+26,Finland,3800,FI,female_total,2142,3562,FI,female_total,2003
+27,North Macedonia,3101,MK,female_total,1746,3032,MK,female_total,1714
+28,Luxembourg,2971,LU,female_total,1291,3437,LU,female_total,1549
+29,Norway,2397,NO,female_total,1434,2616,NO,female_total,1574

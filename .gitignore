@@ -4,4 +4,4 @@
 .Ruserdata
 background.png
 vdicon.png
-venv_tidy/
+.env

@@ -49,7 +49,9 @@ df["format"] = 1
 df["date"][:1]
 
 df.date.filter(regex="^[0-9][^a-zA-Z_]")
+# https://stackoverflow.com/questions/26596297/regex-not-beginning-with-number
 
+# In progress
 
 
 (

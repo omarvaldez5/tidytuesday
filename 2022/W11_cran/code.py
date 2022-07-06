@@ -9,6 +9,7 @@
 import pandas as pd
 import janitor as jr
 import valdezds as vds
+import plotnine as p9
 
 vds.getwd() # Confirm working directory
 
@@ -39,28 +40,21 @@ df.isnull().sum()
 # 2.1 Python
 # ============================================================================ #
 
-def dataCnv(src):
-    return pd.to_datetime(src)
+gg_data = (df.query("date.notnull() and date.str.contains('^[0-9][^a-zA-Z_]')")
+           .deconcatenate_column("date", sep=" ", autoname="col")
+           .query("package.str.contains('ggplot')")
+           .rename_column(old_column_name="col1", new_column_name="new_date")
+           .filter(["package", "new_date"])
+           .to_datetime("new_date")
+           )
 
-df["date_time"] = df.date.apply(dataCnv)
+gg_data["year"] = gg_data["new_date"].dt.year  # Add year column
+gg_data = gg_data.groupby(["year"]).size().rename("n").reset_index() # GroupBy year
 
-
-df["format"] = 1
-df["date"][:1]
-
-df.date.filter(regex="^[0-9][^a-zA-Z_]")
-# https://stackoverflow.com/questions/26596297/regex-not-beginning-with-number
-
-# In progress
-
-
-(
-    df.query("date.notnull() and package.str.contains('ggplot')")
-    .assign(year = df["date"].dt.year)
-)
 
 # ============================================================================ #
 # 2.1.1 Save to CSV
+gg_data.to_csv("2022/W11_cran/data_cran.csv")
 
 
 # ============================================================================ #
@@ -72,10 +66,21 @@ from pandasql import sqldf
 pysqldf = lambda q: sqldf(q, globals()) # Quicker to write query
 
 q = """
+    SELECT
+        *
+    
+    FROM df
+    WHERE 1=1
+        AND date IS NOT NULL
+        AND LOWER(TRIM(package)) LIKE '%ggplot%'
+        AND date REGEXP LIKE '^[0-9][^a-zA-Z_]'
     ;
     """
 
 pysqldf(q)
+
+# REGEXP
+# (Background on this error at: https://sqlalche.me/e/14/e3q8)
 
 
 # ============================================================================ #
@@ -86,9 +91,34 @@ pysqldf(q)
 # 3.1 Plotnine
 # ============================================================================ #
 
+(
+    p9.ggplot(
+        data=gg_data
+    ) +
+    
+    # geoms
+    p9.geom_point(p9.aes(x="year", y="n")) +
+    p9.geom_line(p9.aes(x="year", y="n")) +
+    
+    # labs
+    p9.labs(x="",
+            y="Quantity",
+            title="Number of versions released by year - ggplot2") +
+     
+    # theme
+    p9.theme_minimal() +
+    
+    # watermark
+    p9.watermark("./vdicon.png", xo=25, yo=15)
+)
+
+
 # ============================================================================ #
 # 3.2 Tableau
 # ============================================================================ #
+
+# Link:
+# https://public.tableau.com/app/profile/omar.valdez/viz/TidyTuesdayW11_cran/Sheet1
 
 
 

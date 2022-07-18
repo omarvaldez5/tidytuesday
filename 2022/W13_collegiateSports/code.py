@@ -10,6 +10,7 @@ import pandas as pd
 import janitor as jr
 import valdezds as vds
 import plotnine as p9
+import patchworklib as pw
 
 vds.getwd() # Confirm working directory
 
@@ -132,6 +133,8 @@ p1 = (
     )
 )
 
+p1.save("2022/W13_collegiateSports/plot.png")
+
 p2 = (
     p9.ggplot(
         mapping=p9.aes(x="year", y="value", fill="type"),
@@ -156,13 +159,22 @@ p2 = (
     )
 )
 
-# Find patchowrk equivalent
+p2.save("2022/W13_collegiateSports/plot2.png")
+
+# Two plots, same figure
+g1 = pw.load_ggplot(p1, figsize=(7,2))
+g2 = pw.load_ggplot(p2, figsize=(7,2))
+
+g12 = g1 / g2
+
+# Error verify patchworklib
 
 # ============================================================================ #
 # 3.2 Tableau
 # ============================================================================ #
 
-
+# Link
+#
 
 # ============================================================================ #
 # END
